@@ -14,6 +14,10 @@ public class OuttakeSubsystem {
     PIDFCoefficients pidfCoefficients;
     private double currentTargetVelocity = 0;
 
+    public FlyWheelSpline flyWheelSpline;
+    public double TARGET_RPM=0;
+
+
     public OuttakeSubsystem(HardwareMap hardwareMap) {
         this.hardwareMap=hardwareMap;
         init();
@@ -29,11 +33,18 @@ public class OuttakeSubsystem {
         outtakeM2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         pidfCoefficients = new PIDFCoefficients(0,0,0,0);
+        flyWheelSpline= new FlyWheelSpline();
     }
 
-    public void update(boolean b) {
-        //trigger shooting
+    public void update(boolean b,double distance) {
 
+        TARGET_RPM=flyWheelSpline.getTargetRPM(distance);
+        currentTargetVelocity = TARGET_RPM;
+        pidfCoefficients = new PIDFCoefficients(0,0,1,0);
+        outtakeM2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
+        outtakeM1.setVelocity(-currentTargetVelocity);
+        outtakeM1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
+        outtakeM2.setVelocity(-currentTargetVelocity);
 
     }
 
