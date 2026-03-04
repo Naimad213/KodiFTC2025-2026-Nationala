@@ -10,6 +10,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -17,14 +18,16 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.AGE.libs.libs.KodiBotFinalV3;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
-@TeleOp(name="TELEOP-67" ,group="MEET")
+@TeleOp(name="RED" ,group="NATIONALA")
 public class teleopDeni extends LinearOpMode {
 
     KodiBotFinalV3 robot;
     GamepadEx gm1;
 
+    AprilTagDetection idTower,GPP,PGP,PPG;
 
-    double theta=0;
+    double x,y, turn,turnCorrection,finalTurnPower,theta=0;
+
 
 
 
@@ -49,23 +52,21 @@ public class teleopDeni extends LinearOpMode {
                 gm1.readButtons();
 
 
-                double x = gm1.getLeftX();
-                double y = gm1.getLeftY();
+                 x = gm1.getLeftX();
+                 y = gm1.getLeftY();
                 robot.pinPoint.update();
                 theta = robot.pinPoint.getPosition().getHeading(AngleUnit.DEGREES);
                 theta += 360.0 * Math.abs(Math.min(0, Math.signum(theta)));
-                double manualTurn = gm1.getRightX();
-                double autoTurnCorrection;
+                turn = gm1.getRightX();
 
-                AprilTagDetection id24 = robot.vision.getDetection(24);
+                idTower = robot.vision.getDetection(24);
+
                 if ((gm1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER))){
-                    autoTurnCorrection = robot.vision.getRotationCorrection(id24);
+                    turnCorrection = robot.vision.getRotationCorrection(idTower);
                 } else {
-                    autoTurnCorrection = 0;
+                    turnCorrection = 0;
                 }
-                double finalTurnPower = manualTurn+autoTurnCorrection;
-
-
+                 finalTurnPower = turn+turnCorrection;
 
                 /// CHASSIS DRIVE
                 robot.driveWithVoltageCompensation(x, y, finalTurnPower, theta);
@@ -75,23 +76,47 @@ public class teleopDeni extends LinearOpMode {
                 /// INTAKE
                 double rightTrigger = gm1.getTrigger(RIGHT_TRIGGER);
                 double leftTrigger = gm1.getTrigger(LEFT_TRIGGER);
-                robot.intake.update(rightTrigger, leftTrigger);
+                if(!robot.sortSubsystem.allMatched) {
+                    robot.intake.update(rightTrigger, leftTrigger);
+                }
 
-
-                ///OUTTAKE
+                AprilTagDetection activePattern = null;
+                String activeP="";
+                if (GPP != null) {
+                    activePattern = GPP;
+                    activeP = "GPP";
+                }
+                else if (PGP != null) {
+                    activePattern = PGP;
+                    activeP="PGP";
+                }
+                else if (PPG != null) {
+                    activePattern = PPG;
+                    activeP="PPG";
+                }
+                /// SORTING+OUTTAKE
+                NormalizedColorSensor[] launchQueue = robot.sortSubsystem.getLaunchSequence(activePattern);
 
                 boolean b = gm1.getButton(GamepadKeys.Button.B);
-                robot.outtake.update(b,10);
-
-
-                /// SORTARE
-
-
-
-
+                robot.outtake.update(b, robot.flyWheelSpline.getTargetRPM(robot.vision.getDistance()));
+                if (b) {
+                    for (NormalizedColorSensor sensorToFire : launchQueue) {
+                        if (sensorToFire == robot.sortSubsystem.BLeft) {
+                             robot.servoSubSystem.fireLeft();
+                            sleep(100);
+                        } else if (sensorToFire == robot.sortSubsystem.MidSensor) {
+                             robot.servoSubSystem.fireMid();
+                            sleep(100);
+                        } else if (sensorToFire == robot.sortSubsystem.BRight) {
+                             robot.servoSubSystem.fireRight();
+                            sleep(100);
+                        }
+                    }
+                }
 
 
                 telemetry.addData("voltaj: ", robot.batteryVoltageSensor.getVoltage());
+                telemetry.addData("current pattern : ", activeP);
 
 
 

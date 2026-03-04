@@ -32,6 +32,10 @@ public class KodiBotFinalV3 {
     public OuttakeSubsystem outtake;
 
     public ServoSubSystem servoSubSystem;
+
+    public SortSubsystem sortSubsystem;
+
+    public FlyWheelSpline flyWheelSpline;
     //public AriseSubSystem arise;
 
     /// OBIECTE PENTRU DETECTIE CULOARE / VISION
@@ -67,6 +71,8 @@ public class KodiBotFinalV3 {
         intake =new IntakeSubsystem(hardwareMap);
         outtake = new OuttakeSubsystem(hardwareMap);
         servoSubSystem = new ServoSubSystem(hardwareMap);
+        sortSubsystem = new SortSubsystem(hardwareMap);
+        flyWheelSpline = new FlyWheelSpline();
         //arise= new AriseSubSystem(hardwareMap);
 
         vision = new KodiVision(hardwareMap);

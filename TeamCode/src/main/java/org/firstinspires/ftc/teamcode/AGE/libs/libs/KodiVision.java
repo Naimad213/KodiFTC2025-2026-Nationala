@@ -68,6 +68,16 @@ public class KodiVision {
         }
         return null;
     }
+    public double getDistance() {
+        List<AprilTagDetection> detections = aprilTag.getDetections();
+        for (AprilTagDetection detection : detections) {
+            if (detection.ftcPose.y >0) {
+                double distance = detection.ftcPose.y;
+                return distance;
+            }
+        }
+       return 0;
+    }
 
     private void initVisionPortal() {
         aprilTag = new AprilTagProcessor.Builder()

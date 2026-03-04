@@ -7,15 +7,31 @@ import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
-import java.util.ArrayList;
 
+/**
+ * The SortSubsystem class manages the robot's color sensors and implements logic to identify
+ * and sequence game elements based on detected colors and AprilTag patterns.
+ *
+ * <p>It provides functionality to:</p>
+ * <ul>
+ *   <li>Initialize and configure three color sensors (Left, Middle, Right).</li>
+ *   <li>Identify colors (GREEN, PURPLE, or NOTHING) based on normalized RGBA values and proximity.</li>
+ *   <li>Decode specific AprilTag IDs into predefined color patterns (GPP, PGP, PPG).</li>
+ *   <li>Determine an optimal firing or sorting sequence by matching currently detected colors
+ *       against a target pattern.</li>
+ * </ul>
+ *
+ * @author Kodikas Robotics
+ */
 public class SortSubsystem {
 
-    NormalizedColorSensor BLeft, BRight, MidSensor , mock;
+    public NormalizedColorSensor BLeft, BRight, MidSensor ;
     HardwareMap hardwareMap;
 
     public enum DetectedColor {GREEN, PURPLE, NOTHING}
     public enum Pattern {GPP, PGP, PPG, UNKNOWN}
+
+    public boolean allMatched=false;
 
     // Cleaned up constructor
     public SortSubsystem(HardwareMap hardwareMap) {
@@ -33,7 +49,7 @@ public class SortSubsystem {
         MidSensor.setGain(15);
     }
 
-    // Cleaned up getColor to prevent variables bleeding over
+
     public DetectedColor getColor(NormalizedColorSensor colorSensor) {
         NormalizedRGBA currentColor = colorSensor.getNormalizedColors();
         if (((OpticalDistanceSensor) colorSensor).getLightDetected() < 0.05) {
@@ -100,16 +116,17 @@ public class SortSubsystem {
 
 
 
-        NormalizedColorSensor[] secventaTragere = new NormalizedColorSensor[2];
+        NormalizedColorSensor[] secventaTragere = new NormalizedColorSensor[3];
         int sequenceIndex = 0;
 
 
-        /// by default lever de pe pozitie nu l foloseste
+        /// boolean-uri pentru a verifica daca e valabil spot ul respectiv
         boolean leftUsed = false;
         boolean midUsed = false;
         boolean rightUsed = false;
 
-        /// incercam sa vedem prin fiecare daca
+        /// incercam sa vedem prin fiecare daca se potriveste cu patternu
+        ///  apoi il punem in ordine
         for (DetectedColor desiredColor : desiredOrder) {
             if (!leftUsed && leftColor == desiredColor) {
                 secventaTragere[sequenceIndex++] = BLeft;
@@ -123,14 +140,15 @@ public class SortSubsystem {
             }
         }
         /// daca toate sunt ok atunci nu mai stam sa vedem care nu s pentru proccessing time
-        boolean allMatched = leftUsed && midUsed && rightUsed;
+         allMatched = leftUsed && midUsed && rightUsed;
         if (allMatched) return secventaTragere;
-        else {
-            /// le da dump
+        /// safety check daca nu s folosite toate sa i dea check out
+        if (sequenceIndex < 3) {
             if (!leftUsed) secventaTragere[sequenceIndex++] = BLeft;
-            if (!midUsed) secventaTragere[sequenceIndex++] = MidSensor;
-            if (!rightUsed) secventaTragere[sequenceIndex++] = BRight;
+            if (sequenceIndex < 3 && !midUsed) secventaTragere[sequenceIndex++] = MidSensor;
+            if (sequenceIndex < 3 && !rightUsed) secventaTragere[sequenceIndex++] = BRight;
         }
         return secventaTragere;
+
     }
 }
