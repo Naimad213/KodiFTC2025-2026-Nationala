@@ -35,8 +35,6 @@ public class KodiBotFinalV3 {
     //public AriseSubSystem arise;
 
     /// OBIECTE PENTRU DETECTIE CULOARE / VISION
-    public NormalizedRGBA colors,colorsIntake;
-    public NormalizedColorSensor colorSensor,colorIntake;
 
     public KodiVision vision;
 
@@ -64,17 +62,14 @@ public class KodiBotFinalV3 {
 
         drive = new MecanumDrive(lFMotor,rFMotor,lRMotor,rRMotor);
 
-        colorIntake= hardwareMap.get(NormalizedColorSensor.class, "sensorIntake");
-        colorSensor = hardwareMap.get(NormalizedColorSensor.class, "colorSensor");
-        colorSensor.setGain(10.0f);
 
 
-        intake =new IntakeSubsystem(hardwareMap ,colors,colorsIntake);
+        intake =new IntakeSubsystem(hardwareMap);
         outtake = new OuttakeSubsystem(hardwareMap);
         servoSubSystem = new ServoSubSystem(hardwareMap);
         //arise= new AriseSubSystem(hardwareMap);
 
-        // vision = new KodiVision(hardwareMap);
+        vision = new KodiVision(hardwareMap);
 
 
         pinPoint = new KodiPinPoint(hardwareMap);

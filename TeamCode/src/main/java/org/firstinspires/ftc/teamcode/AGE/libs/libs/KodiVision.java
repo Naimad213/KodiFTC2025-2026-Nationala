@@ -85,37 +85,6 @@ public class KodiVision {
                 .build();
     }
 
-    public double getDistanceCorrection(AprilTagDetection currID) {
-        if (currID == null) {
-            lastError = 0;
-            t.reset();
-            return 0;
-        }
-
-        double deltaTime = t.seconds();
-
-        double error = goalX - currID.ftcPose.bearing;
-
-        double pTerm = kP * error;
-        double dTerm = 0;
-
-        if (deltaTime > 0) {
-            dTerm = kD * (error - lastError) / deltaTime;
-        }
-
-        double turnPower;
-        if (Math.abs(error) < angleTolerance) {
-            turnPower = 0;
-        } else {
-            turnPower = Range.clip(pTerm + dTerm, -MAX_POWER, MAX_POWER);
-        }
-
-        lastError = error;
-        t.reset();
-
-        return turnPower;
-    }
-
     public double getRotationCorrection(AprilTagDetection currID) {
         if (currID == null) {
             lastError = 0;

@@ -21,17 +21,13 @@ public class    IntakeSubsystem {
 
     public CRServo servoIntake;
 
-    NormalizedRGBA colors,colorsIntake;
-    NormalizedColorSensor colorSensor, colorIntake;
-
     HardwareMap hardwareMap;
 
 
     Thread intakeOn;
-    public IntakeSubsystem(HardwareMap hardwareMap , NormalizedRGBA colors ,NormalizedRGBA colorsIntake) {
+    public IntakeSubsystem(HardwareMap hardwareMap ) {
         this.hardwareMap=hardwareMap;
-        this.colors=colors;
-        this.colorsIntake=colorsIntake;
+
         init();
     }
     public void init(){
@@ -39,17 +35,12 @@ public class    IntakeSubsystem {
         servoRight = new CRServo(hardwareMap, "CRservoR");
         servoLeft = new CRServo(hardwareMap, "CRservoL");
         servoIntake = new CRServo(hardwareMap,"upLift");
-        colorSensor = hardwareMap.get(NormalizedColorSensor.class, "colorSensor");
-        colorIntake = hardwareMap.get(NormalizedColorSensor.class, "sensorIntake");
-        colorSensor.setGain(15.0f);
-        colorIntake.setGain(15.0f);
         servoLeft.setInverted(true);
     }
 
 
 
     public void reverseIntake() {
-        // Spins all intake motors in the opposite direction to eject balls
         intakeMotor.set(-1.0);
         servoLeft.set(-1.0);
         servoRight.set(-1.0);
@@ -88,9 +79,7 @@ public class    IntakeSubsystem {
 
 
 
-    public void updateColor() {
-        colorSensor.getNormalizedColors();
-    }
+
 
 
 

@@ -12,7 +12,6 @@ public class KodiLocalization {
 
     HardwareMap hardwareMap;
     public Motor verticalEncoder, horizontalEncoder;
-    KodiIMU imu;
 
     public KodiPinPoint pinpoint;
 

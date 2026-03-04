@@ -12,7 +12,7 @@ public class KodiPinPoint {
 
     HardwareMap hardwareMap;
     public GoBildaPinpointDriver pinpoint;
-    private double headingOffset = 0; // offset for field-centric reference
+    private double headingOffset = 0; // offset pentru field-centric reference
 
 
     public KodiPinPoint(HardwareMap hardwareMap) {

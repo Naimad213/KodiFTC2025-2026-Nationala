@@ -81,7 +81,7 @@ public class teleopDeni extends LinearOpMode {
                 ///OUTTAKE
 
                 boolean b = gm1.getButton(GamepadKeys.Button.B);
-                robot.outtake.update(b);
+                robot.outtake.update(b,10);
 
 
                 /// SORTARE
