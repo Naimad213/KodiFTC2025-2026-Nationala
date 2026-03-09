@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
-import org.firstinspires.ftc.teamcode.libs.AGE.ServoSubSystem;
+;import org.firstinspires.ftc.teamcode.AGE.libs.libs.ServoSubSystem;
 
 @TeleOp
 public class testat_outtake extends LinearOpMode {
@@ -60,7 +60,7 @@ public class testat_outtake extends LinearOpMode {
         outtakeM1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         outtakeM1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        servo= new ServoSubSystem(hardwareMap);
+       // servo= new ServoSubSystem(hardwareMap);
         gm1 =new GamepadEx(gamepad1);
 
         telemetry.addLine("init complete");
@@ -75,64 +75,70 @@ public class testat_outtake extends LinearOpMode {
         waitForStart();
         //f: 15  p: 14
 //9.6 6.8
-        while (opModeIsActive()) {
-            if(gm1.gamepad.optionsWasPressed()){
-                if(currentTargetVelocity==TARGET_BIG_ZONE) currentTargetVelocity=TARGET_SMALL_ZONE;
-                else currentTargetVelocity=TARGET_BIG_ZONE;
-            }
-            if(gm1.gamepad.yWasPressed()) {
-                servo.setLeverUp();
-            }
-            if(gm1.gamepad.aWasPressed()) {
-                servo.setLeverDown();
-            }
-            if(gm1.gamepad.shareWasPressed()){
-                stepIndex = (stepIndex+1) % step.length;
-            }
-            if(gm1.gamepad.dpadLeftWasPressed()){
-                f+=step[stepIndex];
-            }
-            if(gm1.gamepad.dpadRightWasPressed()){
-                f-=step[stepIndex];
-            }
-            if(gm1.gamepad.dpadUpWasPressed()){
-                    p+=step[stepIndex];
-            }
-            if(gm1.gamepad.dpadDownWasPressed()){
-                p-=step[stepIndex];
-            }
+        try {
+            while (opModeIsActive()) {
+                if(gm1.gamepad.optionsWasPressed()){
+                    if(currentTargetVelocity==TARGET_BIG_ZONE) currentTargetVelocity=TARGET_SMALL_ZONE;
+                    else currentTargetVelocity=TARGET_BIG_ZONE;
+                }
+                if(gm1.gamepad.yWasPressed()) {
+                    //servo.setLeverUp();
+                }
+                if(gm1.gamepad.aWasPressed()) {
+                    //servo.setLeverDown();
+                }
+                if(gm1.gamepad.shareWasPressed()){
+                    stepIndex = (stepIndex+1) % step.length;
+                }
+                if(gm1.gamepad.dpadLeftWasPressed()){
+                    f+=step[stepIndex];
+                }
+                if(gm1.gamepad.dpadRightWasPressed()){
+                    f-=step[stepIndex];
+                }
+                if(gm1.gamepad.dpadUpWasPressed()){
+                        p+=step[stepIndex];
+                }
+                if(gm1.gamepad.dpadDownWasPressed()){
+                    p-=step[stepIndex];
+                }
 
-            if(gm1.getButton(GamepadKeys.Button.X)){
-                d+=step[stepIndex];
+                if(gm1.getButton(GamepadKeys.Button.X)){
+                    d+=step[stepIndex];
+                }
+                if(gm1.getButton(GamepadKeys.Button.B)){
+                    d-=step[stepIndex];
+                }
+                PIDFCoefficients pidfCoefficients= new PIDFCoefficients(p,0,d,f);
+                outtakeM2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
+                outtakeM2.setVelocity(-currentTargetVelocity);
+                outtakeM1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
+                outtakeM1.setVelocity(-currentTargetVelocity);
+
+                double v1 = -outtakeM1.getVelocity();
+                double v2 = -outtakeM2.getVelocity();
+                double curVelo = (v1 + v2) / 2.0;
+                double velocityDiff = Math.abs(v1 - v2);
+                double error = Math.abs(currentTargetVelocity - curVelo);
+                telemetry.addData("error : ",error);
+                telemetry.addData("curVelo : ",curVelo);
+                telemetry.addData("TARGET: ",currentTargetVelocity);
+                telemetry.addData("Velocity diff: ", velocityDiff);
+                telemetry.addData("step : ",step);
+
+                telemetry.addData("P : ",p);
+                telemetry.addData("I  : ",i);
+                telemetry.addData("D: ", d);
+                telemetry.addData("F : ", f);
+                telemetry.addData("TIME : ",seconds);
+                telemetry.update();
+                telemetry.addLine();
+
             }
-            if(gm1.getButton(GamepadKeys.Button.B)){
-                d-=step[stepIndex];
-            }
-            PIDFCoefficients pidfCoefficients= new PIDFCoefficients(p,0,d,f);
-            outtakeM2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
-            outtakeM2.setVelocity(-currentTargetVelocity);
-            outtakeM1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
-            outtakeM1.setVelocity(-currentTargetVelocity);
-
-            double v1 = -outtakeM1.getVelocity();
-            double v2 = -outtakeM2.getVelocity();
-            double curVelo = (v1 + v2) / 2.0;
-            double velocityDiff = Math.abs(v1 - v2);
-            double error = Math.abs(currentTargetVelocity - curVelo);
-            telemetry.addData("error : ",error);
-            telemetry.addData("curVelo : ",curVelo);
-            telemetry.addData("TARGET: ",currentTargetVelocity);
-            telemetry.addData("Velocity diff: ", velocityDiff);
-            telemetry.addData("step : ",step);
-
-            telemetry.addData("P : ",p);
-            telemetry.addData("I  : ",i);
-            telemetry.addData("D: ", d);
-            telemetry.addData("F : ", f);
-            telemetry.addData("TIME : ",seconds);
-            telemetry.update();
-            telemetry.addLine();
-
+            throw new InterruptedException();
+        } catch (InterruptedException e) {
+           e.getMessage();
+           e.getCause();
         }
     }
 }

@@ -42,15 +42,91 @@ public class KodiBotFinalV3 {
 
     public KodiVision vision;
 
+    public KodiLimelight limelight;
+
+    public String teamColor ;
 
 
 
 
-    public KodiBotFinalV3(HardwareMap hardwareMap) {
+    public KodiBotFinalV3(HardwareMap hardwareMap,String teamColor) {
         this.hardwareMap = hardwareMap;
-        init();
+        this.teamColor=teamColor;
+        if(this.teamColor.equals("RED")){
+            initRed();
+        }
+        else if(this.teamColor.equals("BLUE")){
+            initBlue();
+        }
+        else{
+            init();
+        }
     }
 
+    public void initRed() {
+        lFMotor = new Motor(hardwareMap, "leftFront");
+        rFMotor = new Motor(hardwareMap, "rightFront");
+        lRMotor = new Motor(hardwareMap, "leftRear");
+        rRMotor = new Motor(hardwareMap, "rightRear");
+
+
+        lFMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        rFMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        lRMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        rRMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        rRMotor.setInverted(false);
+
+        drive = new MecanumDrive(lFMotor,rFMotor,lRMotor,rRMotor);
+
+
+
+        intake =new IntakeSubsystem(hardwareMap);
+        outtake = new OuttakeSubsystem(hardwareMap);
+        servoSubSystem = new ServoSubSystem(hardwareMap);
+        sortSubsystem = new SortSubsystem(hardwareMap);
+        flyWheelSpline = new FlyWheelSpline();
+        //arise= new AriseSubSystem(hardwareMap);
+
+        vision = new KodiVision(hardwareMap , limelight);
+
+
+        pinPoint = new KodiPinPoint(hardwareMap);
+        batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
+
+
+    }
+    public void initBlue() {
+        lFMotor = new Motor(hardwareMap, "leftFront");
+        rFMotor = new Motor(hardwareMap, "rightFront");
+        lRMotor = new Motor(hardwareMap, "leftRear");
+        rRMotor = new Motor(hardwareMap, "rightRear");
+
+
+        lFMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        rFMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        lRMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        rRMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        rRMotor.setInverted(false);
+
+        drive = new MecanumDrive(lFMotor,rFMotor,lRMotor,rRMotor);
+
+
+
+        intake =new IntakeSubsystem(hardwareMap);
+        outtake = new OuttakeSubsystem(hardwareMap);
+        servoSubSystem = new ServoSubSystem(hardwareMap);
+        sortSubsystem = new SortSubsystem(hardwareMap);
+        flyWheelSpline = new FlyWheelSpline();
+        //arise= new AriseSubSystem(hardwareMap);
+
+        vision = new KodiVision(hardwareMap , limelight);
+
+
+        pinPoint = new KodiPinPoint(hardwareMap);
+        batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
+
+
+    }
     public void init() {
         lFMotor = new Motor(hardwareMap, "leftFront");
         rFMotor = new Motor(hardwareMap, "rightFront");
@@ -75,7 +151,7 @@ public class KodiBotFinalV3 {
         flyWheelSpline = new FlyWheelSpline();
         //arise= new AriseSubSystem(hardwareMap);
 
-        vision = new KodiVision(hardwareMap);
+        vision = new KodiVision(hardwareMap , limelight);
 
 
         pinPoint = new KodiPinPoint(hardwareMap);

@@ -38,7 +38,7 @@ public class auto_blue extends LinearOpMode {
 
     public void initHW() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        robot = new KodiBotFinalV3(hardwareMap);
+       // robot = new KodiBotFinalV3(hardwareMap);
         robot.init();
         drive = robot.getDriveSession();
         loc = new KodiLocalization(hardwareMap);
@@ -58,7 +58,7 @@ public class auto_blue extends LinearOpMode {
         try {
 
             /// START POINT TO OUTTAKE
-            robot.outtake.update(true);
+            //robot.outtake.update(true);
             ElapsedTime safetyTimer = new ElapsedTime();
             pp1 = new KodiPursuit(drive, telemetry, loc)
                     .goTo(70, -70, 45)
@@ -68,8 +68,8 @@ public class auto_blue extends LinearOpMode {
             while (opModeIsActive() && !robot.outtake.readyToShoot() && safetyTimer.seconds() < 0.9) ;
             shootBurst(2.4, 130);
             while (opModeIsActive() && !pp1.finished()) ;//IDLE IN INTAKE
-            robot.outtake.update(true);
-            robot.servoSubSystem.setLeverDown();
+           // robot.outtake.update(true);
+           // robot.servoSubSystem.setLeverDown();
             /// SFARSIT START OUTTAKE
 
 
@@ -89,7 +89,7 @@ public class auto_blue extends LinearOpMode {
 
 
             ///OUTTAKE 1
-            robot.outtake.update( true);
+           // robot.outtake.update( true);
             KodiPursuit pp3 = new KodiPursuit(drive, telemetry, loc)
                     .goTo(-70, -70, 45)
                     .execute();
@@ -100,8 +100,8 @@ public class auto_blue extends LinearOpMode {
             while (opModeIsActive() && !robot.outtake.readyToShoot() && safetyTimer.seconds() < 1) ;
             shootBurst(2.4, 100);
             while (opModeIsActive() && !pp3.finished()) ;//IDLE IN INTAKE
-            robot.outtake.update(true);
-            robot.servoSubSystem.setLeverDown();
+            ///robot.outtake.update(true);
+            //robot.servoSubSystem.setLeverDown();
             /// SFARSIT OUTTAKE 1
 
 
@@ -118,7 +118,7 @@ public class auto_blue extends LinearOpMode {
 
 
             ///OUTTAKE 2
-            robot.outtake.update( true);
+            //robot.outtake.update( true);
             KodiPursuit pp5 = new KodiPursuit(drive, telemetry, loc)
                     .goTo(-70, 78, 123)
                     .execute();
@@ -128,8 +128,8 @@ public class auto_blue extends LinearOpMode {
             while (opModeIsActive() && !robot.outtake.readyToShoot() && safetyTimer.seconds() < 1) ;
             shootBurst(2, 140);
             while (opModeIsActive() && !pp1.finished()) ;//iddle
-            robot.outtake.update(true);
-            robot.servoSubSystem.setLeverDown();
+          //  robot.outtake.update(true);
+           // robot.servoSubSystem.setLeverDown();
             /// SFARSIT OUTTAKE 2
 
             /// INTAKE ZONA 3
@@ -173,9 +173,9 @@ public class auto_blue extends LinearOpMode {
             getColor();
             if (detectedColor != DetectedColor.NOTHING) {
                 robot.intake.update(0, 0);
-                robot.servoSubSystem.setLeverUp();
+               // robot.servoSubSystem.setLeverUp();
             } else {
-                robot.servoSubSystem.setLeverDown();
+               // robot.servoSubSystem.setLeverDown();
                 sleep(shootingDelay); //aplicam delay
                 robot.intake.update(1, 0); // luam in intake
             }

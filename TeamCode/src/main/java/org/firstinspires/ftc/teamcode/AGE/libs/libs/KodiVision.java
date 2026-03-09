@@ -5,6 +5,7 @@ import static java.lang.Integer.parseInt;
 import android.graphics.Color;
 import android.util.Size;
 
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -34,6 +35,8 @@ public class KodiVision {
     HardwareMap hardwareMap;
     public Telemetry telemetry;
 
+
+
     public double kP = 0.05;
     public double kD = 0.12001;
 
@@ -49,9 +52,11 @@ public class KodiVision {
 
     public AprilTagProcessor aprilTag;
     public VisionPortal visionPortal;
-
-    public KodiVision(HardwareMap hardwareMap) {
+    public KodiLimelight limelight;
+    public String teamColor;
+    public KodiVision(HardwareMap hardwareMap , KodiLimelight limelight) {
         this.hardwareMap = hardwareMap;
+        this.limelight=limelight;
         initVisionPortal();
     }
 
@@ -72,8 +77,7 @@ public class KodiVision {
         List<AprilTagDetection> detections = aprilTag.getDetections();
         for (AprilTagDetection detection : detections) {
             if (detection.ftcPose.y >0) {
-                double distance = detection.ftcPose.y;
-                return distance;
+                return detection.ftcPose.y;
             }
         }
        return 0;

@@ -43,7 +43,7 @@ public class auto_recalibrare extends LinearOpMode {
     public void initHW(){
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        robot = new KodiBotFinalV3(hardwareMap);
+        //robot = new KodiBotFinalV3(hardwareMap);
         robot.init();
         drive = robot.getDriveSession();
         loc = new KodiLocalization(hardwareMap);

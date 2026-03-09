@@ -13,13 +13,13 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.AGE.libs.libs.KodiBotFinalV3;
 
 
-@TeleOp(name="Tele_op_cu_Intake_11_24.11.2025")
+@TeleOp(name="testIntake")
 public class IntakeTest extends LinearOpMode {
 
     Motor motorTurret1;
 
 
-     CRServo servoIntake;
+    // CRServo servoIntake;
 
     KodiBotFinalV3 robot;
     GamepadEx gm1;
@@ -27,11 +27,11 @@ public class IntakeTest extends LinearOpMode {
 
 
     public void initHW() {
-        robot = new KodiBotFinalV3(hardwareMap);
+        // robot = new KodiBotFinalV3(hardwareMap);
         motorTurret1 = new Motor(hardwareMap, "intakeM");
 
 
-        servoIntake = new CRServo(hardwareMap,"clapa");
+       // servoIntake = new CRServo(hardwareMap,"clapa");
 
         gm1 = new GamepadEx(gamepad1);
 
@@ -69,7 +69,7 @@ public class IntakeTest extends LinearOpMode {
 
 
                 motorTurret1.set(intakeJosPower);
-                servoIntake.set(powerSus-powerSus2);
+               // servoIntake.set(powerSus-powerSus2);
 
 
 
@@ -77,7 +77,7 @@ public class IntakeTest extends LinearOpMode {
                 double y = gm1.getLeftY();
                 double r = gm1.getRightX();
 
-                robot.drive.driveRobotCentric(x, y, r);
+               // robot.drive.driveRobotCentric(x, y, r);
 
             }
 
