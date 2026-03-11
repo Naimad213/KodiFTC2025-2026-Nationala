@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.AGE.libs.libs;
 
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
+import org.firstinspires.ftc.teamcode.libs.AGE.KodiIMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
@@ -14,6 +14,7 @@ public class KodiLocalization {
     public Motor verticalEncoder, horizontalEncoder;
 
     public KodiPinPoint pinpoint;
+    public KodiIMU imu;
 
     Thread updateThread;
 
@@ -26,6 +27,8 @@ public class KodiLocalization {
     public KodiLocalization(HardwareMap hardwareMap){
         this.hardwareMap = hardwareMap;
         pinpoint = new KodiPinPoint(hardwareMap);
+        imu = new KodiIMU(hardwareMap);
+        imu.init();
     }
 
     public void startNew(){
@@ -34,11 +37,9 @@ public class KodiLocalization {
             pinpoint.reset();
             while (!updateThread.isInterrupted() && !kill) {
                 pinpoint.update();
-                x = pinpoint.getPosition().getX(DistanceUnit.CM);//practic x si inversat
-                y = pinpoint.getPosition().getY(DistanceUnit.CM);//y
+                x = pinpoint.getPosition().getX(DistanceUnit.CM);
+                y = pinpoint.getPosition().getY(DistanceUnit.CM) ;
                 theta=pinpoint.getPosition().getHeading(AngleUnit.DEGREES);
-
-
             }
         });
         updateThread.start();
@@ -49,9 +50,9 @@ public class KodiLocalization {
             pinpoint.reset();
             while (!updateThread.isInterrupted() && !kill) {
                 pinpoint.update();
-                x = pinpoint.getPosition().getX(DistanceUnit.CM);//practic x si inversat
-                y = pinpoint.getPosition().getY(DistanceUnit.CM);//y
-                theta=pinpoint.getPosition().getHeading(AngleUnit.DEGREES);
+                x = pinpoint.getPosition().getY(DistanceUnit.CM);//practic x si inversat
+                y = -pinpoint.getPosition().getX(DistanceUnit.CM);//y
+                theta=-pinpoint.getPosition().getHeading(AngleUnit.DEGREES);
                 theta += 360.0 * Math.abs(Math.min(0,Math.signum(theta)));
 
             }
@@ -89,6 +90,8 @@ public class KodiLocalization {
         });
         updateThread.start();
     }
+
+
 
     public Point getLocAsPoint(){
         return new Point(x,y,theta);

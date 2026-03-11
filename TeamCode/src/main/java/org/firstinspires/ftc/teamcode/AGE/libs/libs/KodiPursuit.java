@@ -3,6 +3,10 @@ package org.firstinspires.ftc.teamcode.AGE.libs.libs;
 import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.AGE.libs.libs.Config;
+import org.firstinspires.ftc.teamcode.AGE.libs.libs.KodiLocalization;
+import org.firstinspires.ftc.teamcode.AGE.libs.libs.Point;
+import org.firstinspires.ftc.teamcode.AGE.libs.libs.SpeedController;
 
 import java.util.ArrayList;
 
@@ -126,21 +130,21 @@ public class KodiPursuit {
                     Config.hA,
                     Config.hV,
                     Config.hBr,
-                    Config.hI, Config.toleranceXY, Config.cutOff
+                    Config.hI,Config.toleranceXY,Config.cutOff
             );
 
             SpeedController scV = new SpeedController(
                     Config.vA,
                     Config.vV,
                     Config.vBr,
-                    Config.vI, Config.toleranceXY, Config.cutOff
+                    Config.vI,Config.toleranceXY,Config.cutOff
             );
 
             SpeedController scR = new SpeedController(
                     Config.rA,
                     Config.rV,
                     Config.rBr,
-                    Config.rI, Config.toleranceR, Config.cutOff
+                    Config.rI,Config.toleranceR,Config.cutOff
             );
             for(int i=0;!kill && i < waypoints.size();i++){
                 targetPoint = waypoints.get(i);
@@ -160,9 +164,9 @@ public class KodiPursuit {
 
                 while (!kill && !check){
 
-                    scH.updateCoef(Config.hA, Config.hV, Config.hBr, Config.hI, Config.toleranceXY, Config.cutOff);
-                    scV.updateCoef(Config.vA, Config.vV, Config.vBr, Config.vI, Config.toleranceXY, Config.cutOff);
-                    scR.updateCoef(Config.rA, Config.rV, Config.rBr, Config.rI, Config.toleranceR, Config.cutOff);
+                    scH.updateCoef(Config.hA, Config.hV, Config.hBr,Config.hI,Config.toleranceXY,Config.cutOff);
+                    scV.updateCoef(Config.vA, Config.vV, Config.vBr,Config.vI,Config.toleranceXY,Config.cutOff);
+                    scR.updateCoef(Config.rA, Config.rV, Config.rBr,Config.rI,Config.toleranceR,Config.cutOff);
 
                     Point target = getBestPoint(m,b,loc.getLocAsPoint(),targetPoint);
 
@@ -192,7 +196,7 @@ public class KodiPursuit {
                     double r = -scR.getSpeed(errorTheta);///+r merge ceva
 
                     drive.driveFieldCentric(x,y,r,loc.theta);///+theta merge ceva
-                /// AM SCHIMBAT FIELDCENTRIC
+                    /// AM SCHIMBAT FIELDCENTRIC
 
                     double deltaX = targetPoint.x - loc.x;
                     double deltaY = targetPoint.y - loc.y;

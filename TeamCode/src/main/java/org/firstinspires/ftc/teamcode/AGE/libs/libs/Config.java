@@ -28,9 +28,9 @@ public class Config {
 
     public static double targetT = 2;///MEREU MAI MARE CA 1.5
 
-    public static double hV = 1, hA = 3, hBr =  40, hI = 0;
-    public static double vV =1, vA = 3, vBr =40, vI = 0;
-    public static double rV = 1 , rA = 2, rBr = 30   , rI = 0;
+    public static double hV = 0.7, hA = 1, hBr =  45, hI = 0;
+    public static double vV =0.7, vA = 1, vBr =45, vI = 0;
+    public static double rV = 0.3 , rA = 0.5, rBr = 38  , rI = 0;
 
     public static double toleranceXY = 3;
     public static double toleranceR = 3;

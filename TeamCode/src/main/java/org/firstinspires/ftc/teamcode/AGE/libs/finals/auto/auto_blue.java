@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-import org.firstinspires.ftc.teamcode.AGE.libs.libs.KodiBotFinalV3;
+import org.firstinspires.ftc.teamcode.AGE.libs.libs.KodiBotFinalV4;
 import org.firstinspires.ftc.teamcode.AGE.libs.libs.KodiLocalization;
 import org.firstinspires.ftc.teamcode.AGE.libs.libs.KodiPursuit;
 
@@ -26,7 +26,7 @@ public class auto_blue extends LinearOpMode {
 
     DetectedColor detectedColor = DetectedColor.NOTHING;
 
-    KodiBotFinalV3 robot;
+    KodiBotFinalV4 robot;
     MecanumDrive drive;
     KodiPursuit pp1;
     KodiLocalization loc;
@@ -38,8 +38,8 @@ public class auto_blue extends LinearOpMode {
 
     public void initHW() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-       // robot = new KodiBotFinalV3(hardwareMap);
-        robot.init();
+       // robot = new KodiBotFinalV4(hardwareMap);
+
         drive = robot.getDriveSession();
         loc = new KodiLocalization(hardwareMap);
         colorSensor = hardwareMap.get(NormalizedColorSensor.class, "colorSensor");

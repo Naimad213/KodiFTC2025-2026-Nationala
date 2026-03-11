@@ -25,7 +25,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
  */
 public class SortSubsystem {
 
-    public NormalizedColorSensor BLeft, BRight, MidSensor ;
+    public NormalizedColorSensor sensorLeft, sensorRight, sensorMid ;
     HardwareMap hardwareMap;
 
     public enum DetectedColor {GREEN, PURPLE, NOTHING}
@@ -40,13 +40,12 @@ public class SortSubsystem {
     }
 
     public void init() {
-        BLeft = hardwareMap.get(NormalizedColorSensor.class, "BLeft");
-        BRight = hardwareMap.get(NormalizedColorSensor.class, "BRight");
-        MidSensor = hardwareMap.get(NormalizedColorSensor.class, "MidSensor");
-
-        BLeft.setGain(15);
-        BRight.setGain(15);
-        MidSensor.setGain(15);
+        sensorLeft = hardwareMap.get(NormalizedColorSensor.class, "sensorRight");
+        sensorLeft.setGain(2.0f);
+        sensorRight = hardwareMap.get(NormalizedColorSensor.class, "sensorLeft");
+        sensorRight.setGain(5.0f);
+        sensorMid = hardwareMap.get(NormalizedColorSensor.class, "sensorMid");
+        sensorMid.setGain(5.0f);
     }
 
 
@@ -81,9 +80,9 @@ public class SortSubsystem {
         if(pattern == Pattern.UNKNOWN) return new NormalizedColorSensor[0];
         /// 1
         /// vedem fiecare sensor ce detecteaza
-        DetectedColor leftColor = getColor(BLeft);
-        DetectedColor midColor = getColor(MidSensor);
-        DetectedColor rightColor = getColor(BRight);
+        DetectedColor leftColor = getColor(sensorLeft);
+        DetectedColor midColor = getColor(sensorMid);
+        DetectedColor rightColor = getColor(sensorRight);
         /// 2
         /// definim array-ul cu ordinea buna
         DetectedColor[] desiredOrder;
@@ -129,13 +128,13 @@ public class SortSubsystem {
         ///  apoi il punem in ordine
         for (DetectedColor desiredColor : desiredOrder) {
             if (!leftUsed && leftColor == desiredColor) {
-                secventaTragere[sequenceIndex++] = BLeft;
+                secventaTragere[sequenceIndex++] = sensorLeft;
                 leftUsed = true;
             } else if (!midUsed && midColor == desiredColor) {
-                secventaTragere[sequenceIndex++] = MidSensor;
+                secventaTragere[sequenceIndex++] = sensorMid;
                 midUsed = true;
             } else if (!rightUsed && rightColor == desiredColor) {
-                secventaTragere[sequenceIndex++] = BRight;
+                secventaTragere[sequenceIndex++] = sensorRight;
                 rightUsed = true;
             }
         }
@@ -144,9 +143,9 @@ public class SortSubsystem {
         if (allMatched) return secventaTragere;
         /// safety check daca nu s folosite toate sa i dea check out
         if (sequenceIndex < 3) {
-            if (!leftUsed) secventaTragere[sequenceIndex++] = BLeft;
-            if (sequenceIndex < 3 && !midUsed) secventaTragere[sequenceIndex++] = MidSensor;
-            if (sequenceIndex < 3 && !rightUsed) secventaTragere[sequenceIndex++] = BRight;
+            if (!leftUsed) secventaTragere[sequenceIndex++] = sensorLeft;
+            if (sequenceIndex < 3 && !midUsed) secventaTragere[sequenceIndex++] = sensorMid;
+            if (sequenceIndex < 3 && !rightUsed) secventaTragere[sequenceIndex++] = sensorRight;
         }
         return secventaTragere;
 

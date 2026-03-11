@@ -15,54 +15,77 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 @TeleOp(name="ServoTest")
 public class ServoTest extends LinearOpMode {
 
-    public ServoEx fireLeft, fireRight, fireMid, servoTest;
-    double currentPosition = 0; // Start at middle
+    public ServoEx fireLeft, fireRight, fireMid;
+    
+    // Default (Standby) positions
+    double currentLeft = 0.0;
+    double currentMid = 1.0; 
+    double currentRight = 0.45;
 
-    /// 0.25-0.26 SHOOT POSITION SERVO LEFT
     GamepadEx gm1;
 
     @Override
     public void runOpMode() throws InterruptedException {
-            // Hardware names must match the configuration on the Control Hub
-            fireLeft = new SimpleServo(hardwareMap, "fireLeft", 0, 300, AngleUnit.DEGREES);
-            fireMid = new SimpleServo(hardwareMap, "fireMid", 0, 300, AngleUnit.DEGREES);
-            fireRight = new SimpleServo(hardwareMap, "fireRight", 0, 300, AngleUnit.DEGREES);
-            gm1 = new GamepadEx(gamepad1);
-            telemetry= new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        // Fix: Use SimpleServo or hardwareMap.get
+        fireLeft = new SimpleServo(hardwareMap, "fireRight", 0, 300, AngleUnit.DEGREES);
+        fireMid = new SimpleServo(hardwareMap, "fireMid", 0, 300, AngleUnit.DEGREES);
+        fireRight = new SimpleServo(hardwareMap, "fireLeft", 0, 300, AngleUnit.DEGREES);
+        fireMid.setInverted(true);
+        // Set standby positions immediately
+        fireLeft.setPosition(currentLeft);
+        fireMid.setPosition(currentMid);
+        fireRight.setPosition(currentRight);
 
-            telemetry.addData("Status", "Initialized");
-            telemetry.update();
+        gm1 = new GamepadEx(gamepad1);
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-            waitForStart();
+        telemetry.addData("Status", "Initialized - Servos at Standby");
+        telemetry.update();
 
-        try {
-            while (opModeIsActive()) {
-                gm1.readButtons();
+        waitForStart();
 
-                // Adjust position with DPAD UP/DOWN
-                if (gm1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
-                    currentPosition += 0.05;
-                } else if (gm1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
-                    currentPosition -= 0.05;
-                }
+        while (opModeIsActive()) {
+            gm1.readButtons();
 
-                // Clamp the position between 0.0 and 1.0
-                currentPosition = Range.clip(currentPosition, 0, 1);
+            // --- MANUAL TUNING ---
+            // Left (DPAD UP/DOWN)
+            if (gm1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) currentLeft += 0.05;
+            else if (gm1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) currentLeft -= 0.05;
 
-                // Apply to all servos for testing
-                fireLeft.setPosition(currentPosition);
-                fireMid.setPosition(currentPosition);
-                fireRight.setPosition(currentPosition);
+            // Mid (DPAD LEFT/RIGHT)
+            if (gm1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) currentMid += 0.05;
+            else if (gm1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) currentMid -= 0.05;
 
-                // Display values to debug
-                telemetry.addData("Target Position", "%.2f", currentPosition);
-                telemetry.addData("FireLeft Pos", fireLeft.getPosition());
-                telemetry.addData("FireMid Pos", fireMid.getPosition());
-                telemetry.addData("FireRight Pos", fireRight.getPosition());telemetry.update();
+            // Right (X / B)
+            if (gm1.wasJustPressed(GamepadKeys.Button.X)) currentRight += 0.05;
+            else if (gm1.wasJustPressed(GamepadKeys.Button.B)) currentRight -= 0.05;
+
+            // --- QUICK ACTION TEST ---
+            // Hold 'A' to see all shoot positions at once
+            if (gm1.getButton(GamepadKeys.Button.A)) {
+                fireLeft.setPosition(0.35);
+                fireMid.setPosition(0.5);
+                fireRight.setPosition(0.15);
+            } else {
+                // Return to tuned standby positions
+                currentLeft = Range.clip(currentLeft, 0, 1);
+                currentMid = Range.clip(currentMid, 0, 1);
+                currentRight = Range.clip(currentRight, 0, 1);
+
+                fireLeft.setPosition(currentLeft);
+                fireMid.setPosition(currentMid);
+                fireRight.setPosition(currentRight);
             }
-        } catch (Exception e) {
-            e.getMessage();
-            e.getCause();
+
+            telemetry.addData("--- STANDBY (Tuning) ---", "");
+            telemetry.addData("Left (DPAD U/D)", "%.2f", currentLeft);
+            telemetry.addData("Mid (DPAD L/R)", "%.2f", currentMid);
+            telemetry.addData("Right (X/B)", "%.2f", currentRight);
+            telemetry.addLine("\nHOLD 'A' to test ACTION positions");
+            telemetry.addData("FireLeft Actual", fireLeft.getPosition());
+            telemetry.addData("FireMid Actual", fireMid.getPosition());
+            telemetry.addData("FireRight Actual", fireRight.getPosition());
+            telemetry.update();
         }
     }
 }

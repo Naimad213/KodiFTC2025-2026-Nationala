@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.AGE.libs.libs;
+package org.firstinspires.ftc.teamcode.libs.AGE;
 
 import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.arcrobotics.ftclib.hardware.GyroEx;
@@ -31,8 +31,8 @@ public class KodiIMU extends GyroEx {
 
     private int multiplier;
 
-    private RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
-    private RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.UP;
+    private RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.FORWARD;
+    private RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.RIGHT;
 
     private RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
 
@@ -45,19 +45,12 @@ public class KodiIMU extends GyroEx {
 
     double angle,lastAngle;
 
-    public KodiIMU(HardwareMap hw, String imuName) {
-        imu = hw.get(IMU.class, imuName);
+    public KodiIMU(HardwareMap hw) {
+        imu = hw.get(IMU.class, "imu");
         multiplier = 1;
     }
 
-    /**
-     * Create a new object for the built-in gyro/imu in the Rev Expansion Hub with the default configuration name of "imu"
-     *
-     * @param hw Hardware map
-     */
-    public KodiIMU(HardwareMap hw) {
-        this(hw, "imu");
-    }
+
 
     @Override
     public void init() {
@@ -73,12 +66,6 @@ public class KodiIMU extends GyroEx {
         multiplier *= -1;
     }
 
-//    @Override
-//    public double getHeadingOLD() {
-//        double currentAngle = getAbsoluteHeading() - offset;
-//        currentAngle += 360 * (1 - Math.signum(Math.max(currentAngle,0)));
-//        return currentAngle;
-//    }
 
     @Override
     public double getHeading(){

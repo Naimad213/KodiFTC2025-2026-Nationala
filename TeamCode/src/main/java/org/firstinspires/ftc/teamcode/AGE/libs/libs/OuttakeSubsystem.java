@@ -17,6 +17,8 @@ public class OuttakeSubsystem {
     public FlyWheelSpline flyWheelSpline;
     public double TARGET_RPM=0;
 
+    public double lastP =0, lastF=0;
+
 
     public OuttakeSubsystem(HardwareMap hardwareMap) {
         this.hardwareMap=hardwareMap;
@@ -37,15 +39,38 @@ public class OuttakeSubsystem {
     }
 
     public void update(boolean b,double distance) {
+        if(b) {
+            TARGET_RPM = flyWheelSpline.getTargetRPM(distance);
+            currentTargetVelocity = TARGET_RPM;
+            pidfCoefficients = new PIDFCoefficients(14, 0, 0, 14);
+            outtakeM2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
+            outtakeM1.setVelocity(-currentTargetVelocity);
+            outtakeM1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
+            outtakeM2.setVelocity(-currentTargetVelocity);
+        }else{
+            stop();
+        }
 
-        TARGET_RPM=flyWheelSpline.getTargetRPM(distance);
-        currentTargetVelocity = TARGET_RPM;
-        pidfCoefficients = new PIDFCoefficients(0,0,1,0);
-        outtakeM2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
-        outtakeM1.setVelocity(-currentTargetVelocity);
-        outtakeM1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
-        outtakeM2.setVelocity(-currentTargetVelocity);
+    }
+    public void updateTrain(boolean b, double targetRPM, double p, double f) {
+        if (b) {
+            currentTargetVelocity = targetRPM;
 
+            // Only write to hardware if the values actually changed!
+            if (p != lastP || f != lastF) {
+                pidfCoefficients = new PIDFCoefficients(p, 0, 0, f);
+                outtakeM1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
+                outtakeM2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
+                lastP = p;
+                lastF = f;
+            }
+
+            // Set velocity AFTER coefficients
+            outtakeM1.setVelocity(-currentTargetVelocity);
+            outtakeM2.setVelocity(-currentTargetVelocity);
+        } else {
+            stop();
+        }
     }
 
 
@@ -63,13 +88,13 @@ public class OuttakeSubsystem {
 
     //telemetry
     public double getVelocity() {
-        return (outtakeM1.getVelocity()+ outtakeM2.getVelocity())/2 ;
+        return Math.abs((outtakeM1.getVelocity()+ outtakeM2.getVelocity())/2) ;
     }
     public boolean readyToShoot() {
         double v1 = outtakeM1.getVelocity();
         double v2 = outtakeM2.getVelocity();
-        double ActualVelocity = Math.abs(v1) + Math.abs(v2);
-        return Math.abs(Math.abs(currentTargetVelocity) - ActualVelocity) < 300;
+        double ActualVelocity = (Math.abs(v1) + Math.abs(v2))/2;
+        return Math.abs(Math.abs(currentTargetVelocity) - ActualVelocity) < 100;
     }
 
 

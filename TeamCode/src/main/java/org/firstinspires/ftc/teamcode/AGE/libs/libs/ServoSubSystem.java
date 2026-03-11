@@ -1,72 +1,61 @@
 package org.firstinspires.ftc.teamcode.AGE.libs.libs;
 
-
 import com.arcrobotics.ftclib.hardware.ServoEx;
 import com.arcrobotics.ftclib.hardware.SimpleServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class ServoSubSystem {
 
     HardwareMap hardwareMap;
-     public ServoEx fireLeft, fireRight, fireMid;
+    public ServoEx fireLeft, fireRight, fireMid;
 
-    public final double LEVER_UP_POSITION = Position.LEVER_UP.val;
-    public final double LEVER_DOWN_POSITION = Position.LEVER_DOWN.val;
+    // fireLeft: 0 start, 0.3 shoot
+    public final double LEFT_START = 0.0;
+    public final double LEFT_SHOOT = 0.3;
 
-    ElapsedTime wait= new ElapsedTime();
-    public enum Position {
+    // fireMid: 0 start, 0.35 shoot
+    public final double MID_START = 0.0;
+    public final double MID_SHOOT = 0.35;
 
-        LEVER_DOWN(0),
-        LEVER_UP(0.33);
+    // fireRight: 0.45 start, 0.15 shoot
+    public final double RIGHT_START = 0.5;
+    public final double RIGHT_SHOOT = 0;
 
-        public final double val;
-        Position(double val) {
-            this.val = val;
-        }
+    public ServoSubSystem(HardwareMap hardwareMap) {
+        this.hardwareMap = hardwareMap;
+        init();
     }
 
-    public ServoSubSystem(HardwareMap hardwareMap ) {
-       this.hardwareMap=hardwareMap;
-       init();
+    public void init() {
+
+        fireLeft = new SimpleServo(hardwareMap, "fireRight", 0, 300, AngleUnit.DEGREES);
+        fireMid = new SimpleServo(hardwareMap, "fireMid", 0, 300, AngleUnit.DEGREES);
+        fireMid.setInverted(true);
+        fireRight = new SimpleServo(hardwareMap, "fireLeft", 0, 300, AngleUnit.DEGREES);
+        setAllStart();
     }
 
-
-    public void init(){
-        fireLeft = new SimpleServo(hardwareMap, "fireLeft", 0, 300,
-                AngleUnit.DEGREES);
-        fireMid = new SimpleServo(hardwareMap, "fireMid", 0, 300,
-                AngleUnit.DEGREES);
-        fireRight = new SimpleServo(hardwareMap, "fireRight", 0, 300,
-                AngleUnit.DEGREES);
-
-    }
-
-   public void fireLeft(){
-        wait.reset();
-        fireLeft.setPosition(LEVER_UP_POSITION);
-        if(wait.seconds()>0.5){
-            fireLeft.setPosition(LEVER_DOWN_POSITION);
-        }
-   }
-    public void fireMid(){
-        wait.reset();
-        fireMid.setPosition(LEVER_UP_POSITION);
-        if(wait.seconds()>0.5){
-            fireMid.setPosition(LEVER_DOWN_POSITION);
-        }
-    }
-    public void fireRight(){
-        wait.reset();
-        fireRight.setPosition(LEVER_UP_POSITION);
-        if(wait.seconds()>0.5){
-            fireRight.setPosition(LEVER_DOWN_POSITION);
-        }
+    public void setAllStart() {
+        fireLeft.setPosition(LEFT_START);
+        fireMid.setPosition(MID_START);
+        fireRight.setPosition(RIGHT_START);
     }
 
 
+    public void fireLeft() {
+        fireLeft.setPosition(LEFT_SHOOT);
+    }
 
+    public void fireMid() {
+        fireMid.setPosition(MID_SHOOT);
+    }
 
+    public void fireRight() {
+        fireRight.setPosition(RIGHT_SHOOT);
+    }
+
+    public void resetLeft()  { fireLeft.setPosition(LEFT_START); }
+    public void resetMid()   { fireMid.setPosition(MID_START); }
+    public void resetRight() { fireRight.setPosition(RIGHT_START); }
 }

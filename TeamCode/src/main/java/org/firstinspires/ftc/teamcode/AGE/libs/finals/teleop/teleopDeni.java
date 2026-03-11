@@ -19,16 +19,18 @@ import java.util.List;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
-import org.firstinspires.ftc.teamcode.AGE.libs.libs.KodiBotFinalV3;
+
+import org.firstinspires.ftc.teamcode.AGE.libs.libs.KodiBotFinalV4;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 @TeleOp(name="RED" ,group="NATIONALA")
 public class teleopDeni extends LinearOpMode {
 
-    KodiBotFinalV3 robot;
+    KodiBotFinalV4 robot;
     GamepadEx gm1;
 
-    AprilTagDetection idTower,GPP,PGP,PPG;
+    boolean GPP,PGP,PPG;
+    AprilTagDetection gpp,pgp,ppg;
 
     double x,y, turn,turnCorrection,finalTurnPower,theta=0;
 
@@ -37,12 +39,12 @@ public class teleopDeni extends LinearOpMode {
 
     public void initHW() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-       // robot = new KodiBotFinalV3(hardwareMap);
+        robot = new KodiBotFinalV4(hardwareMap,"RED");
         gm1 = new GamepadEx(gamepad1);
         gm1.gamepad.setLedColor(217, 65, 148, 999999);
         robot.pinPoint.init();
 
-        // ADDED: Get all hubs and set them to MANUAL bulk caching
+        /// manual bullk cache pentru a optimiza loading time
         allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
@@ -53,7 +55,7 @@ public class teleopDeni extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         initHW();
 
-        // ADDED: Timer for loop times
+
         ElapsedTime loopTimer = new ElapsedTime();
 
         waitForStart();
@@ -61,7 +63,7 @@ public class teleopDeni extends LinearOpMode {
 
         try {
             while (opModeIsActive()) {
-                // ADDED: Clear the bulk cache at the VERY START of every loop
+               //cache clearing
                 for (LynxModule hub : allHubs) {
                     hub.clearBulkCache();
                 }
@@ -75,10 +77,9 @@ public class teleopDeni extends LinearOpMode {
                 theta += 360.0 * Math.abs(Math.min(0, Math.signum(theta)));
                 turn = gm1.getRightX();
 
-                idTower = robot.vision.getDetection(24);
-
-                if ((gm1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER))){
-                    turnCorrection = robot.vision.getRotationCorrection(idTower);
+                robot.vision.updateLimelight();
+                if ((gm1.getButton(GamepadKeys.Button.RIGHT_BUMPER))){
+                    turnCorrection = robot.vision.getLimelightRotationCorrection(robot.vision.isSeeingAprilTag(21));
                 } else {
                     turnCorrection = 0;
                 }
@@ -95,21 +96,21 @@ public class teleopDeni extends LinearOpMode {
                 }
 
                 /// DETECTIE PENTRU SORTARE
-                GPP = robot.vision.getDetection(21);
-                PGP = robot.vision.getDetection(22);
-                PPG = robot.vision.getDetection(23);
+                GPP = robot.vision.isSeeingAprilTag(21);
+                PGP = robot.vision.isSeeingAprilTag(22);
+                PPG = robot.vision.isSeeingAprilTag(23);
                 AprilTagDetection activePattern = null;
                 String activeP="";
-                if (GPP != null) {
-                    activePattern = GPP;
+                if (GPP) {
+                    activePattern = gpp;
                     activeP = "GPP";
                 }
-                else if (PGP != null) {
-                    activePattern = PGP;
+                else if (PPG) {
+                    activePattern = ppg;
                     activeP="PGP";
                 }
-                else if (PPG != null) {
-                    activePattern = PPG;
+                else  {
+                    activePattern = ppg;
                     activeP="PPG";
                 }
 
@@ -119,22 +120,22 @@ public class teleopDeni extends LinearOpMode {
                 robot.outtake.update(b, robot.flyWheelSpline.getTargetRPM(robot.vision.getDistance()));
                 if (b && robot.outtake.readyToShoot()) {
                     for (NormalizedColorSensor sensorToFire : launchQueue) {
-                        if (sensorToFire == robot.sortSubsystem.BLeft) {
+                        if (sensorToFire == robot.sortSubsystem.sensorLeft) {
                             robot.servoSubSystem.fireLeft();
                             sleep(50);
-                        } else if (sensorToFire == robot.sortSubsystem.MidSensor) {
+                        } else if (sensorToFire == robot.sortSubsystem.sensorMid) {
                             robot.servoSubSystem.fireMid();
                             sleep(50);
-                        } else if (sensorToFire == robot.sortSubsystem.BRight) {
+                        } else if (sensorToFire == robot.sortSubsystem.sensorRight) {
                             robot.servoSubSystem.fireRight();
                             sleep(50);
                         }
                     }
                 }
 
-                // ADDED: Calculate and display loop time
+                /// calculam looptime
                 double loopTime = loopTimer.milliseconds();
-                loopTimer.reset(); // Reset timer for the next loop
+                loopTimer.reset();
 
                 telemetry.addData("Loop Time (ms)", loopTime);
                 telemetry.addData("Loop Hz", 1000.0 / loopTime);

@@ -5,7 +5,7 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
-public class KodiBotFinalV3 {
+public class KodiBotFinalV4 {
     HardwareMap hardwareMap;
 
     public MecanumDrive drive;
@@ -28,11 +28,11 @@ public class KodiBotFinalV3 {
     public KodiLimelight limelight;
     public String teamColor;
 
-    public KodiBotFinalV3(HardwareMap hardwareMap, String teamColor) {
+    public KodiBotFinalV4(HardwareMap hardwareMap, String teamColor) {
         this.hardwareMap = hardwareMap;
         this.teamColor = teamColor;
 
-       // this.limelight = new KodiLimelight();
+        this.limelight = new KodiLimelight();
 
         if (this.teamColor.equals("RED")) {
             initRed();
@@ -84,11 +84,11 @@ public class KodiBotFinalV3 {
 
         intake = new IntakeSubsystem(hardwareMap);
         outtake = new OuttakeSubsystem(hardwareMap);
-        //servoSubSystem = new ServoSubSystem(hardwareMap);
-        //sortSubsystem = new SortSubsystem(hardwareMap);
-        //flyWheelSpline = new FlyWheelSpline();
+        servoSubSystem = new ServoSubSystem(hardwareMap);
+        sortSubsystem = new SortSubsystem(hardwareMap);
+        flyWheelSpline = new FlyWheelSpline();
 
-        //vision = new KodiVision(hardwareMap, limelight, teamColor);
+        vision = new KodiVision(hardwareMap, limelight, teamColor);
 
         pinPoint = new KodiPinPoint(hardwareMap);
         batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
@@ -131,8 +131,8 @@ public class KodiBotFinalV3 {
         outtake.stop();
         drive.driveFieldCentric(0, 0, 0, 0);
 
-//        if (vision != null) {
-//            vision.killSwitch();
-//        }
+        if (vision != null) {
+            vision.killSwitch();
+        }
     }
 }
