@@ -10,6 +10,12 @@ public class KodiLimelight {
     public Limelight3A limelight;
     HardwareMap hardwareMap;
 
+    public void updateRobotOrientation(double yaw) {
+        if (limelight != null) {
+            limelight.updateRobotOrientation(yaw);
+        }
+    }
+
     public void initRed(HardwareMap hardwareMap){
         this.hardwareMap = hardwareMap;
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
