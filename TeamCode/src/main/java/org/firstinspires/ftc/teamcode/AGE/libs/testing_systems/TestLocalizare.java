@@ -11,7 +11,8 @@ import org.firstinspires.ftc.teamcode.AGE.libs.libs.KodiBotFinalV4;
 import org.firstinspires.ftc.teamcode.AGE.libs.libs.KodiLocalization;
 
 
-@TeleOp
+@TeleOp(name = "test localizare", group = "TESTAT-PIESE")
+
 public class TestLocalizare extends LinearOpMode {
 
     //KodiBotFinalV3 robot;
@@ -32,7 +33,7 @@ public class TestLocalizare extends LinearOpMode {
             initHW();
 
             waitForStart();
-        loc.startNew();
+        loc.start();
 
 
             while(opModeIsActive() && !isStopRequested()){

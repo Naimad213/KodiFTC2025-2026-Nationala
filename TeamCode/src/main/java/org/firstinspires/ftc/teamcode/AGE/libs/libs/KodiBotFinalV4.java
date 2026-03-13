@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.AGE.libs.libs;
 import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 public class KodiBotFinalV4 {
@@ -19,7 +20,6 @@ public class KodiBotFinalV4 {
     public IntakeSubsystem intake;
     public OuttakeSubsystem outtake;
     public ServoSubSystem servoSubSystem;
-    public SortSubsystem sortSubsystem;
     public FlyWheelSpline flyWheelSpline;
     //public AriseSubSystem arise;
 
@@ -27,12 +27,14 @@ public class KodiBotFinalV4 {
     public KodiVision vision;
     public KodiLimelight limelight;
     public String teamColor;
+    public IMU imu;
 
     public KodiBotFinalV4(HardwareMap hardwareMap, String teamColor) {
         this.hardwareMap = hardwareMap;
         this.teamColor = teamColor;
 
         this.limelight = new KodiLimelight();
+        this.imu = hardwareMap.get(IMU.class, "imu");
 
         if (this.teamColor.equals("RED")) {
             initRed();
@@ -51,19 +53,17 @@ public class KodiBotFinalV4 {
         rFMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         lRMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         rRMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        rFMotor.setInverted(true);
+        rFMotor.setInverted(false);
 
         drive = new MecanumDrive(lFMotor, rFMotor, lRMotor, rRMotor);
 
         intake = new IntakeSubsystem(hardwareMap);
         outtake = new OuttakeSubsystem(hardwareMap);
         servoSubSystem = new ServoSubSystem(hardwareMap);
-        sortSubsystem = new SortSubsystem(hardwareMap);
         flyWheelSpline = new FlyWheelSpline();
 
-        vision = new KodiVision(hardwareMap, limelight, teamColor);
+        vision = new KodiVision(hardwareMap, limelight, teamColor, imu);
 
-        pinPoint = new KodiPinPoint(hardwareMap);
         batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
     }
 
@@ -72,25 +72,22 @@ public class KodiBotFinalV4 {
         rFMotor = new Motor(hardwareMap, "rightFront");
         lRMotor = new Motor(hardwareMap, "leftRear");
         rRMotor = new Motor(hardwareMap, "rightRear");
-        rFMotor.setInverted(true);
+
 
         lFMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         rFMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         lRMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         rRMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        rRMotor.setInverted(false);
-
+        rFMotor.setInverted(false);
         drive = new MecanumDrive(lFMotor, rFMotor, lRMotor, rRMotor);
 
         intake = new IntakeSubsystem(hardwareMap);
         outtake = new OuttakeSubsystem(hardwareMap);
         servoSubSystem = new ServoSubSystem(hardwareMap);
-        sortSubsystem = new SortSubsystem(hardwareMap);
         flyWheelSpline = new FlyWheelSpline();
 
-        vision = new KodiVision(hardwareMap, limelight, teamColor);
+        vision = new KodiVision(hardwareMap, limelight, teamColor, imu);
 
-        pinPoint = new KodiPinPoint(hardwareMap);
         batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
     }
 

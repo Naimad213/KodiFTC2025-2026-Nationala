@@ -3,7 +3,9 @@ package org.firstinspires.ftc.teamcode.AGE.libs.libs;
 
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import org.firstinspires.ftc.teamcode.libs.AGE.KodiIMU;
+
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.AGE.libs.libs.KodiIMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
@@ -23,12 +25,26 @@ public class KodiLocalization {
 
     public boolean kill = false;
 
+    public double visionAlpha = 0.15;
+    
+    public double maxVisionCorrection = 8.0;
+
 
     public KodiLocalization(HardwareMap hardwareMap){
         this.hardwareMap = hardwareMap;
         pinpoint = new KodiPinPoint(hardwareMap);
+        verticalEncoder = new Motor(hardwareMap, "verticalEncoder");
+        horizontalEncoder = new Motor(hardwareMap, "rightRear");
+
         imu = new KodiIMU(hardwareMap);
         imu.init();
+        imu.reset();
+
+        verticalEncoder.setDistancePerPulse(Config.TICKS_TO_CM_GOBILDA);
+        horizontalEncoder.setDistancePerPulse(Config.TICKS_TO_CM_GOBILDA);
+
+        verticalEncoder.resetEncoder();
+        horizontalEncoder.resetEncoder();
     }
 
     public void startNew(){
@@ -37,9 +53,11 @@ public class KodiLocalization {
             pinpoint.reset();
             while (!updateThread.isInterrupted() && !kill) {
                 pinpoint.update();
+
                 x = pinpoint.getPosition().getX(DistanceUnit.CM);
                 y = pinpoint.getPosition().getY(DistanceUnit.CM) ;
                 theta=pinpoint.getPosition().getHeading(AngleUnit.DEGREES);
+
             }
         });
         updateThread.start();
@@ -56,6 +74,37 @@ public class KodiLocalization {
                 theta += 360.0 * Math.abs(Math.min(0,Math.signum(theta)));
 
             }
+        });
+        updateThread.start();
+    }
+    public void start(){
+        updateThread = new Thread(() -> {
+            x = y = 0;
+            imu.reset();
+            while (!updateThread.isInterrupted()){
+
+                double heading = imu.getHeading();
+
+                theta = (int) (0.8 * heading + (1 - 0.8) * theta);//ALPHA IMU = 0.8
+
+                double dV = verticalEncoder.getDistance() - prevV;//invert value for right X
+                double dH = -horizontalEncoder.getDistance() - prevH;
+
+                prevV += dV;
+                prevH += dH;
+
+                double hyp = -Math.hypot(dV,dH);
+                double moveAngle = Math.atan2(dV,dH);
+
+                double robotAngle = Math.toRadians(360 - theta);
+
+                double deltaX = hyp * Math.sin(robotAngle + moveAngle);
+                double deltaY = hyp * Math.cos(robotAngle + moveAngle);
+
+                x += deltaX;
+                y += deltaY;
+            }
+
         });
         updateThread.start();
     }
@@ -89,6 +138,25 @@ public class KodiLocalization {
 
         });
         updateThread.start();
+    }
+
+    public void updateFromVision(double visionX, double visionY, double visionTheta, boolean isConfident) {
+        if (!isConfident) return;
+
+        /// diferenta pentru a trece coordonatele prin filtru
+        double diffX = visionX - this.x;
+        double diffY = visionY - this.y;
+
+
+        if (Math.abs(diffX) > maxVisionCorrection) diffX = Math.signum(diffX) * maxVisionCorrection;
+        if (Math.abs(diffY) > maxVisionCorrection) diffY = Math.signum(diffY) * maxVisionCorrection;
+
+        this.x += diffX * visionAlpha;
+        this.y += diffY * visionAlpha;
+
+
+        this.theta = visionTheta;
+         pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, this.x, this.y, AngleUnit.DEGREES, this.theta));
     }
 
 

@@ -12,7 +12,7 @@ public class OuttakeSubsystem {
     HardwareMap hardwareMap;
     public DcMotorEx outtakeM1,outtakeM2;
     PIDFCoefficients pidfCoefficients;
-    private double currentTargetVelocity = 0;
+    public double currentTargetVelocity = 150;
 
     public FlyWheelSpline flyWheelSpline;
     public double TARGET_RPM=0;
@@ -91,10 +91,12 @@ public class OuttakeSubsystem {
         return Math.abs((outtakeM1.getVelocity()+ outtakeM2.getVelocity())/2) ;
     }
     public boolean readyToShoot() {
+        boolean ready;
         double v1 = outtakeM1.getVelocity();
         double v2 = outtakeM2.getVelocity();
         double ActualVelocity = (Math.abs(v1) + Math.abs(v2))/2;
-        return Math.abs(Math.abs(currentTargetVelocity) - ActualVelocity) < 100;
+        ready= Math.abs(Math.abs(currentTargetVelocity) - ActualVelocity) < 149;
+        return ready;
     }
 
 

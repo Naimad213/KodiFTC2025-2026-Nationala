@@ -46,7 +46,7 @@ public class auto_recalibrare extends LinearOpMode {
         robot = new KodiBotFinalV4(hardwareMap,"RED");
         drive = robot.getDriveSession();
         loc = new KodiLocalization(hardwareMap);
-        loc.startNew();
+        loc.start();
 
     }
     @Override
@@ -60,8 +60,8 @@ public class auto_recalibrare extends LinearOpMode {
         try {
 
             pp= new KodiPursuit(drive, telemetry,loc)
-                    .goTo(15,50,90)
-                    .goTo(0,0,0)
+                    .goTo(-15,-50,90)
+                    .goTo(15,50,0)
                     .execute();
             pursuitRegistry.add(pp);
             while(opModeIsActive() && !pp.finished());

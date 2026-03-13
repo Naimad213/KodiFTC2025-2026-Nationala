@@ -4,27 +4,31 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.AGE.libs.libs.KodiIMU;
 import org.firstinspires.ftc.teamcode.AGE.libs.libs.KodiLimelight;
 import org.firstinspires.ftc.teamcode.AGE.libs.libs.KodiVision;
 
 
+@Disabled
 @TeleOp
 public class limelightTest extends LinearOpMode {
 
 
     KodiVision vision;
     KodiLimelight limelight;
-
+    KodiIMU imu;
 
     @Override
     public void runOpMode() throws InterruptedException {
-
+        imu = new KodiIMU(hardwareMap);
+        imu.init();
         telemetry= new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         limelight= new KodiLimelight();
-        vision = new KodiVision(hardwareMap, limelight  , "RED");
+        vision = new KodiVision(hardwareMap, limelight  , "RED" , imu.imu);
 
         waitForStart();
         if(isStopRequested()) return;

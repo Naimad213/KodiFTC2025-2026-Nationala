@@ -31,6 +31,7 @@ public class KodiPinPoint {
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED,
                 GoBildaPinpointDriver.EncoderDirection.REVERSED);
+        pinpoint.setHeading(90 , AngleUnit.DEGREES);
         pinpoint.setOffsets(0, 0 , DistanceUnit.MM);
         pinpoint.resetPosAndIMU();
     }

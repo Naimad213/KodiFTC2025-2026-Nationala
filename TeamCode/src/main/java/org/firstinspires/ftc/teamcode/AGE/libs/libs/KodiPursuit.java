@@ -40,7 +40,7 @@ public class KodiPursuit {
 
     public KodiPursuit goTo(double x, double y, double theta){
         double angle = (int)(theta + 3600) % 360;
-        waypoints.add(new Point(x,y, -angle));
+        waypoints.add(new Point(x,y, angle));
         return this;
     }
 

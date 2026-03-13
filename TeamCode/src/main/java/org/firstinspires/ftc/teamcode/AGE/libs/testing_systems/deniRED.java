@@ -10,6 +10,7 @@ import com.arcrobotics.ftclib.hardware.ServoEx;
 import com.arcrobotics.ftclib.hardware.SimpleServo;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
@@ -22,8 +23,9 @@ import org.firstinspires.ftc.teamcode.AGE.libs.libs.KodiBotFinalV4;
 import org.firstinspires.ftc.teamcode.AGE.libs.libs.KodiLimelight;
 import org.firstinspires.ftc.teamcode.AGE.libs.libs.KodiPinPoint;
 
+@Disabled
 @TeleOp(name = "testTeleop", group = "TESTE-PIESE")
-public class testTeleop extends LinearOpMode {
+public class deniRED extends LinearOpMode {
    GamepadEx gm1;
 
    KodiBotFinalV4 robot;
@@ -60,11 +62,11 @@ public class testTeleop extends LinearOpMode {
                  distance =robot.vision.getDistance();
             }
             robot.outtake.update(b , distance);
-            if(robot.outtake.readyToShoot()){
-                robot.servoSubSystem.fireMid();
-            }else{
-                robot.servoSubSystem.resetMid();
-            }
+//            if(robot.outtake.readyToShoot()){
+//                robot.servoSubSystem.fireMid();
+//            }else{
+//                robot.servoSubSystem.resetMid();
+//            }
             telemetry.addData("ready to shoot" , robot.outtake.readyToShoot());
             telemetry.addData("cm " , robot.vision.getDistance());
             telemetry.update();

@@ -28,8 +28,8 @@ public class    IntakeSubsystem {
         intakeMotor = new Motor(hardwareMap, "intakeM");
     }
 
-    public void update(double leftTrigger, double rightTrigger) {
-        double intakePower = rightTrigger - leftTrigger;
+    public void update(double out, double in) {
+        double intakePower = in - out;
         intakeMotor.set(intakePower);
     }
 

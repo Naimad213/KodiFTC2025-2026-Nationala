@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.AGE.libs.testing_systems;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
@@ -13,6 +14,7 @@ import org.firstinspires.ftc.teamcode.AGE.libs.libs.SortSubsystem;
 import java.util.ArrayList;
 import java.util.List;
 
+@Disabled
 @TeleOp
 public class ColorSensorTest extends LinearOpMode {
      NormalizedColorSensor fireLeft, fireMid,fireRight;

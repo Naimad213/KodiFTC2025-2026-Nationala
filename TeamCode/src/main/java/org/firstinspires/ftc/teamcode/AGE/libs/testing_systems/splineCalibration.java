@@ -43,12 +43,9 @@ public class splineCalibration extends LinearOpMode {
 
             double x = -gm1.getLeftX();
             double y = -gm1.getLeftY();
-            robot.pinPoint.update();
-            double theta = robot.pinPoint.getPosition().getHeading(AngleUnit.DEGREES);
-            theta += 360.0 * Math.abs(Math.min(0, Math.signum(theta)));
             double turn = -gm1.getRightX();
 
-            robot.driveWithVoltageCompensation(x, y, turn, theta);
+            robot.driveWithVoltageCompensation(x, y, turn);
 
             // Corrected input logic using GamepadEx methods
             if(gm1.wasJustPressed(GamepadKeys.Button.BACK)){ // Mapping for Share/Options
@@ -66,27 +63,21 @@ public class splineCalibration extends LinearOpMode {
             if(gm1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)){
                 p -= step[stepIndex];
             }
-
+            robot.servoSubSystem.updateInversion();
             boolean b = gm1.getButton(GamepadKeys.Button.B);
-            boolean shootMid = gm1.getButton(GamepadKeys.Button.X);
-            boolean shootLeft = gm1.getButton(GamepadKeys.Button.LEFT_BUMPER);
-            boolean shootRight = gm1.getButton(GamepadKeys.Button.RIGHT_BUMPER);
+            robot.servoSubSystem.servoDreapta.setInverted(true);
+            // --- QUICK ACTION TEST ---
+            // By sending the EXACT SAME number to both, you will easily see
+            // the physical mirroring when one is inverted.
+            if (gm1.getButton(GamepadKeys.Button.A)) {
+                robot.servoSubSystem.servoDreapta.setPosition(0);
+                //servoTest2.setPosition(0.8); // Changed from 0 to 0.8
+            } else {
+                robot.servoSubSystem.servoDreapta.setPosition(0.5);
+                //servoTest2.setPosition(0.0); // Changed from 0.8 to 0.0
+            }
             
-            if(shootMid){
-                robot.servoSubSystem.fireMid();
-            } else {
-                robot.servoSubSystem.resetMid();
-            }
-            if(shootLeft){
-                robot.servoSubSystem.fireLeft();
-            } else {
-                robot.servoSubSystem.resetLeft();
-            }
-            if(shootRight){
-                robot.servoSubSystem.fireRight();
-            }else{
-                robot.servoSubSystem.resetRight();
-            }
+
 
             if(gm1.wasJustPressed(GamepadKeys.Button.Y)){
                 targetRPM += 100;

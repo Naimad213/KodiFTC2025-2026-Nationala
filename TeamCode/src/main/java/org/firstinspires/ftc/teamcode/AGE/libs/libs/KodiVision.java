@@ -35,9 +35,9 @@ public class KodiVision {
     public LLResult result; // We will store the result here once per loop
     public String teamColor;
 
-    final double LIMELIGHT_HEIGHT = 17;
-    final double APRILTAG_HEIGHT = 29.5;
-    final double LIMELIGHT_ANGLE = 21;
+    final double LIMELIGHT_HEIGHT = 28;
+    final double APRILTAG_HEIGHT = 74;
+    final double LIMELIGHT_ANGLE = 20;
 
     public KodiVision(HardwareMap hardwareMap, KodiLimelight limelight, String teamColor, IMU imu) {
         this.hardwareMap = hardwareMap;
@@ -58,31 +58,7 @@ public class KodiVision {
         result = limelight.getResult();
     }
 
-    public Pose3D updateMegaTag2Pose(){
-        if (imu == null || limelight == null) return null;
-        double currentYaw = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-        double angularVelocity = imu.getRobotAngularVelocity(AngleUnit.DEGREES).zRotationRate;
-        limelight.updateRobotOrientation(currentYaw);
-        updateLimelight();
 
-        if (Math.abs(angularVelocity) > 720) {
-            return null;
-        }
-
-        if (result != null && result.isValid()) {
-            Pose3D mt2Pose = result.getBotpose_MT2();
-
-            if (mt2Pose != null) {
-                double x = mt2Pose.getPosition().x;
-                double y = mt2Pose.getPosition().y;
-                if (telemetry != null) {
-                    telemetry.addData("MT2 Location:", "(" + x + ", " + y + ")");
-                }
-                return mt2Pose;
-            }
-        }
-        return null;
-    }
 
     public boolean isSeeingAprilTag(int targetId) {
         if (result != null && result.isValid()) {
@@ -131,6 +107,31 @@ public class KodiVision {
         lastError = error;
         t.reset();
         return turnPower;
+    }
+    public Pose3D updateMegaTag2Pose(){
+        if (imu == null || limelight == null) return null;
+        double currentYaw = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+        double angularVelocity = imu.getRobotAngularVelocity(AngleUnit.DEGREES).zRotationRate;
+        limelight.updateRobotOrientation(currentYaw);
+        updateLimelight();
+
+        if (Math.abs(angularVelocity) > 720) {
+            return null;
+        }
+
+        if (result != null && result.isValid()) {
+            Pose3D mt2Pose = result.getBotpose_MT2();
+
+            if (mt2Pose != null) {
+                double x = mt2Pose.getPosition().x;
+                double y = mt2Pose.getPosition().y;
+                if (telemetry != null) {
+                    telemetry.addData("MT2 Location:", "(" + x + ", " + y + ")");
+                }
+                return mt2Pose;
+            }
+        }
+        return null;
     }
 
 

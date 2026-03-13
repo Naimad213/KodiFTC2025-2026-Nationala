@@ -1,122 +1,55 @@
-package org.firstinspires.ftc.teamcode.libs.AGE;
+package org.firstinspires.ftc.teamcode.AGE.libs.libs;
 
 import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.arcrobotics.ftclib.hardware.GyroEx;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
-
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 public class KodiIMU extends GyroEx {
 
-    private IMU imu;
-
-    /***
-     * Heading relative to starting position
-     */
-    double globalHeading;
-
-    /**
-     * Heading relative to last offset
-     */
-    double relativeHeading;
-
-    /**
-     * Offset between global heading and relative heading
-     */
-    double offset;
-
-    private int multiplier;
-
-    private RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.FORWARD;
-    private RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.RIGHT;
-
-    private RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
-
-    /**
-     * Create a new object for the built-in gyro/imu in the Rev Expansion Hub
-     *
-     * @param hw      Hardware map
-     * @param imuName Name of sensor in configuration
-     */
-
-    double angle,lastAngle;
+    public IMU imu;
+    private double offset = 0;
+    private int multiplier = 1;
 
     public KodiIMU(HardwareMap hw) {
         imu = hw.get(IMU.class, "imu");
-        multiplier = 1;
     }
-
-
 
     @Override
     public void init() {
-        imu.initialize(new IMU.Parameters(orientationOnRobot));
+        // MAKE SURE THESE MATCH YOUR PHYSICAL HUB MOUNTING
+        RevHubOrientationOnRobot orientation = new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
+                RevHubOrientationOnRobot.UsbFacingDirection.DOWN
+        );
+
+        imu.initialize(new IMU.Parameters(orientation));
         reset();
-        globalHeading = 0;
-        relativeHeading = 0;
-        offset = 0;
-        lastAngle = 0;
     }
 
     public void invertGyro() {
         multiplier *= -1;
     }
 
-
     @Override
-    public double getHeading(){
-        return getAbsoluteHeading() - offset;
+    public double getHeading() {
+        // Returns normalized heading [-180, 180] relative to offset
+        double heading = getAbsoluteHeading() - offset;
+        return AngleUnit.normalizeDegrees(heading);
     }
 
     public double getAngle() {
-        // Obține Yaw-ul (rotația pe axa Z)
-        double rawYaw = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-
-        // Dacă ai nevoie de 0-360 (pentru codul tău de path following):
-        double theta360 = (rawYaw % 360.0 + 360.0) % 360.0;
-
-        return theta360;
-        // Sau returnează rawYaw direct dacă adaptezi matematica la -180/180
-    }
-    public double getHeadingOld() {
-        double currentAngle = getAbsoluteHeading();
-        double deltaAngle = currentAngle - lastAngle;
-        // Detectăm tranzițiile de la 90 la -90 sau de la -90 la 90
-        if (deltaAngle < -90) {
-            // Tranziție de la 90 la -90
-            deltaAngle += 180;
-        } else if (deltaAngle > 90) {
-            // Tranziție de la -90 la 90
-            deltaAngle -= 180;
-        }
-
-        // Actualizăm unghiul global
-        globalHeading += deltaAngle;
-
-        // Actualizăm ultima citire
-        lastAngle = currentAngle;
-
-        // Convertim unghiul global în intervalul [0, 360]
-        return (globalHeading % 360 + 360 - offset) % 360;
+        // Returns 0-360 heading
+        return AngleUnit.normalizeDegrees(getAbsoluteHeading() - offset) + 180;
     }
 
     @Override
     public double getAbsoluteHeading() {
-        return imu.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.ZXY, AngleUnit.DEGREES).firstAngle * multiplier;
-    }
-
-    @Override
-    public double[] getAngles() {
-        return new double[0];
-    }
-
-    @Override
-    public Rotation2d getRotation2d() {
-        return Rotation2d.fromDegrees(getHeading());
+        YawPitchRollAngles angles = imu.getRobotYawPitchRollAngles();
+        return angles.getYaw(AngleUnit.DEGREES) * multiplier;
     }
 
     @Override
@@ -124,17 +57,13 @@ public class KodiIMU extends GyroEx {
         offset = getAbsoluteHeading();
     }
 
-    public void zeroHeading() {
-        imu.resetYaw();
+    @Override
+    public Rotation2d getRotation2d() {
+        return Rotation2d.fromDegrees(getHeading());
     }
 
-    @Override
-    public void disable() {
-        imu.close();
-    }
-
-    @Override
-    public String getDeviceType() {
-        return "";
-    }
+    // Boilerplate for GyroEx
+    @Override public double[] getAngles() { return new double[]{0, 0, 0}; }
+    @Override public void disable() { imu.close(); }
+    @Override public String getDeviceType() { return "REV Internal IMU"; }
 }

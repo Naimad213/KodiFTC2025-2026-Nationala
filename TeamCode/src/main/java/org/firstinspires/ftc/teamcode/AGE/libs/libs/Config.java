@@ -5,7 +5,7 @@ public class Config {
 
 
 
-
+    public static double  TICKS_TO_CM_GOBILDA=0.00502 ;
 
 
 
@@ -24,13 +24,13 @@ public class Config {
 //
 //    public static double toleranceXY = 5;
 //    public static double toleranceR = 4.5;
-    public static double targetR = 25;
+    public static double targetR = 35;
 
-    public static double targetT = 2;///MEREU MAI MARE CA 1.5
+    public static double targetT = 1.5;///MEREU MAI MARE CA 1.5
 
-    public static double hV = 0.7, hA = 1, hBr =  45, hI = 0;
-    public static double vV =0.7, vA = 1, vBr =45, vI = 0;
-    public static double rV = 0.3 , rA = 0.5, rBr = 38  , rI = 0;
+    public static double hV = 0.7, hA = 1, hBr =  30, hI = 0;
+    public static double vV =0.7, vA = 1, vBr =30, vI = 0;
+    public static double rV = 0.3 , rA = 0.5, rBr = 30  , rI = 0;
 
     public static double toleranceXY = 3;
     public static double toleranceR = 3;

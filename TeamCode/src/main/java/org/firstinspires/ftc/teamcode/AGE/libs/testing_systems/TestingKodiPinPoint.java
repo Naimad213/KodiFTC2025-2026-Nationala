@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.AGE.libs.testing_systems;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -9,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.AGE.libs.libs.KodiPinPoint;
 
+@Disabled
 @TeleOp(name = "PinPoint-Test")
 public class TestingKodiPinPoint extends LinearOpMode {
 

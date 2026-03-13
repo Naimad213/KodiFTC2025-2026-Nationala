@@ -1,21 +1,29 @@
 package org.firstinspires.ftc.teamcode.AGE.libs.testing_systems;
 
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.LEFT_TRIGGER;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Trigger.RIGHT_TRIGGER;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.arcrobotics.ftclib.hardware.ServoEx;
 import com.arcrobotics.ftclib.hardware.SimpleServo;
+import com.arcrobotics.ftclib.hardware.motors.Motor;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
+
+
 @TeleOp(name="ServoTest")
 public class ServoTest extends LinearOpMode {
 
-    public ServoEx fireLeft, fireRight, fireMid;
+    public ServoEx fireLeft, fireRight, fireMid , servoTest,servoTest2;
+    public Motor motor;
     
     // Default (Standby) positions
     double currentLeft = 0.0;
@@ -26,15 +34,10 @@ public class ServoTest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        // Fix: Use SimpleServo or hardwareMap.get
-        fireLeft = new SimpleServo(hardwareMap, "fireRight", 0, 300, AngleUnit.DEGREES);
-        fireMid = new SimpleServo(hardwareMap, "fireMid", 0, 300, AngleUnit.DEGREES);
-        fireRight = new SimpleServo(hardwareMap, "fireLeft", 0, 300, AngleUnit.DEGREES);
-        fireMid.setInverted(true);
-        // Set standby positions immediately
-        fireLeft.setPosition(currentLeft);
-        fireMid.setPosition(currentMid);
-        fireRight.setPosition(currentRight);
+
+        servoTest = new SimpleServo(hardwareMap, "servoDreapta", 0, 300, AngleUnit.DEGREES);
+        //motor = new Motor(hardwareMap  , "testMotor");
+
 
         gm1 = new GamepadEx(gamepad1);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -42,50 +45,54 @@ public class ServoTest extends LinearOpMode {
         telemetry.addData("Status", "Initialized - Servos at Standby");
         telemetry.update();
 
+
+
         waitForStart();
 
         while (opModeIsActive()) {
             gm1.readButtons();
 
-            // --- MANUAL TUNING ---
-            // Left (DPAD UP/DOWN)
-            if (gm1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) currentLeft += 0.05;
-            else if (gm1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) currentLeft -= 0.05;
+            boolean inverted2 , inverted1=false ;
 
-            // Mid (DPAD LEFT/RIGHT)
-            if (gm1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) currentMid += 0.05;
-            else if (gm1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) currentMid -= 0.05;
+            waitForStart();
 
-            // Right (X / B)
-            if (gm1.wasJustPressed(GamepadKeys.Button.X)) currentRight += 0.05;
-            else if (gm1.wasJustPressed(GamepadKeys.Button.B)) currentRight -= 0.05;
 
-            // --- QUICK ACTION TEST ---
-            // Hold 'A' to see all shoot positions at once
-            if (gm1.getButton(GamepadKeys.Button.A)) {
-                fireLeft.setPosition(0.35);
-                fireMid.setPosition(0.5);
-                fireRight.setPosition(0.15);
-            } else {
-                // Return to tuned standby positions
-                currentLeft = Range.clip(currentLeft, 0, 1);
-                currentMid = Range.clip(currentMid, 0, 1);
-                currentRight = Range.clip(currentRight, 0, 1);
+                gm1.readButtons();
 
-                fireLeft.setPosition(currentLeft);
-                fireMid.setPosition(currentMid);
-                fireRight.setPosition(currentRight);
-            }
+                /// INVERT SERVO PENTRU BLOCARE
+                // Toggle Servo 2 (X)
+             //  servoTest2.setInverted(true);
 
-            telemetry.addData("--- STANDBY (Tuning) ---", "");
-            telemetry.addData("Left (DPAD U/D)", "%.2f", currentLeft);
-            telemetry.addData("Mid (DPAD L/R)", "%.2f", currentMid);
-            telemetry.addData("Right (X/B)", "%.2f", currentRight);
-            telemetry.addLine("\nHOLD 'A' to test ACTION positions");
-            telemetry.addData("FireLeft Actual", fireLeft.getPosition());
-            telemetry.addData("FireMid Actual", fireMid.getPosition());
-            telemetry.addData("FireRight Actual", fireRight.getPosition());
-            telemetry.update();
+                // Reset both to Normal (DPAD UP)
+//                if (gm1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+//                    inverted1 = false;
+//                    inverted2 = false;
+                    //servoTest.setInverted(true);
+                inverted2 = true;
+                    //servoTest2.setInverted(inverted2);
+//                }
+            servoTest.setInverted(true);
+                // --- QUICK ACTION TEST ---
+                // By sending the EXACT SAME number to both, you will easily see
+                // the physical mirroring when one is inverted.
+                if (gm1.getButton(GamepadKeys.Button.A)) {
+                    servoTest.setPosition(0);
+                    //servoTest2.setPosition(0.8); // Changed from 0 to 0.8
+                } else {
+                    servoTest.setPosition(0.5);
+                    //servoTest2.setPosition(0.0); // Changed from 0.8 to 0.0
+                }
+                double rightTrigger = gm1.getTrigger(RIGHT_TRIGGER);///in
+                double leftTrigger = gm1.getTrigger(LEFT_TRIGGER);///OUT
+
+                //motor.set(rightTrigger-leftTrigger);
+                // --- TELEMETRY ---
+                telemetry.addData("Hold 'A' to Move", "Both commanded to 0.8");
+                telemetry.addLine();
+                telemetry.addData("Servo 1 (Y to toggle)", "Inverted: " + inverted1 + " | Pos: " + servoTest.getPosition());
+                telemetry.addData("Servo 2 (X to toggle)", "Inverted: " + inverted2 + " | Pos: " ); //servoTest2.getPosition());
+                telemetry.update();
+
         }
     }
 }
