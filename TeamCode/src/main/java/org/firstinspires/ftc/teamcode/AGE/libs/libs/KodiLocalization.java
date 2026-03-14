@@ -32,7 +32,7 @@ public class KodiLocalization {
 
     public KodiLocalization(HardwareMap hardwareMap){
         this.hardwareMap = hardwareMap;
-        pinpoint = new KodiPinPoint(hardwareMap);
+
         verticalEncoder = new Motor(hardwareMap, "verticalEncoder");
         horizontalEncoder = new Motor(hardwareMap, "rightRear");
 
@@ -41,6 +41,7 @@ public class KodiLocalization {
         imu.reset();
 
         verticalEncoder.setDistancePerPulse(Config.TICKS_TO_CM_GOBILDA);
+        verticalEncoder.setInverted(true);
         horizontalEncoder.setDistancePerPulse(Config.TICKS_TO_CM_GOBILDA);
 
         verticalEncoder.resetEncoder();
@@ -81,14 +82,14 @@ public class KodiLocalization {
         updateThread = new Thread(() -> {
             x = y = 0;
             imu.reset();
+            imu.invertGyro();
             while (!updateThread.isInterrupted()){
+                theta = imu.getAbsoluteHeading();
 
-                double heading = imu.getHeading();
-
-                theta = (int) (0.8 * heading + (1 - 0.8) * theta);//ALPHA IMU = 0.8
+                theta = (theta % 360 + 360) % 360;
 
                 double dV = verticalEncoder.getDistance() - prevV;//invert value for right X
-                double dH = -horizontalEncoder.getDistance() - prevH;
+                double dH = horizontalEncoder.getDistance() - prevH;
 
                 prevV += dV;
                 prevH += dH;
@@ -106,6 +107,52 @@ public class KodiLocalization {
             }
 
         });
+        updateThread.start();
+    }
+    public void startGemini(){
+        updateThread = new Thread(() -> {
+        // 1. Reset Position and Yaw
+        x = y = 0;
+        imu.reset(); // Correctly calls imu.resetYaw() in KodiIMU
+        imu.invertGyro();
+        // Initialize previous values to prevent a massive jump on the first loop
+        prevV = verticalEncoder.getDistance();
+        prevH = horizontalEncoder.getDistance();
+
+        while (!updateThread.isInterrupted()){
+            // 2. Get Heading and Normalize to 0-360
+            theta = imu.getAbsoluteHeading();
+            theta = (theta % 360 + 360) % 360;
+            double headingRad = Math.toRadians(theta);
+
+            // 3. Calculate local displacements
+
+            double dV =  horizontalEncoder.getDistance()- prevV;
+            double dH =  verticalEncoder.getDistance()- prevH;
+
+            prevV += dV;
+            prevH += dH;
+
+            // 4. Proper Rotation Matrix (Fixes the "90 degree crazy" issue)
+            double cos = Math.cos(headingRad);
+            double sin = Math.sin(headingRad);
+
+            // Transform local movement (dH, dV) to global coordinates
+            // Standard: Global X = Local_X * cos - Local_Y * sin
+            double deltaX = dH * cos - dV * sin;
+            double deltaY = dH * sin + dV * cos;
+
+            // 5. Apply "Invert X and Y" by negating the addition
+            this.x -= deltaX;
+            this.y -= deltaY;
+
+            try {
+                Thread.sleep(10); // Prevents CPU hogging
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    });
         updateThread.start();
     }
 

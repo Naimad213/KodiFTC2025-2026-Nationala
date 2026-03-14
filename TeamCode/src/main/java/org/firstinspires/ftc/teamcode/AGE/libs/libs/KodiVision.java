@@ -17,7 +17,7 @@ public class KodiVision {
 
     HardwareMap hardwareMap;
     public Telemetry telemetry;
-    public IMU imu;
+
 
     public double kP = 0.05;
     public double kD = 0.12001;
@@ -37,13 +37,12 @@ public class KodiVision {
 
     final double LIMELIGHT_HEIGHT = 28;
     final double APRILTAG_HEIGHT = 74;
-    final double LIMELIGHT_ANGLE = 20;
+    final double LIMELIGHT_ANGLE = 21;
 
-    public KodiVision(HardwareMap hardwareMap, KodiLimelight limelight, String teamColor, IMU imu) {
+    public KodiVision(HardwareMap hardwareMap, KodiLimelight limelight, String teamColor) {
         this.hardwareMap = hardwareMap;
         this.limelight = limelight;
         this.teamColor = teamColor;
-        this.imu = imu;
 
         if (teamColor.equals("RED")) {
             limelight.initRed(hardwareMap);
@@ -73,14 +72,15 @@ public class KodiVision {
     }
 
     public double getDistance() {
+        double distance=0;
         result= limelight.getResult();
         if (result != null && result.isValid()) {
             double ty = result.getTy();
             double angleToGoalRadians = Math.toRadians(LIMELIGHT_ANGLE + ty);
             if (angleToGoalRadians == 0) return 1e-6;
-            return (APRILTAG_HEIGHT - LIMELIGHT_HEIGHT) / Math.tan(angleToGoalRadians);
+              distance=(APRILTAG_HEIGHT - LIMELIGHT_HEIGHT) / Math.tan(angleToGoalRadians);
         }
-        return -1;
+       return distance;
     }
 
     public double getLimelightRotationCorrection(boolean hasTarget) {
@@ -108,31 +108,7 @@ public class KodiVision {
         t.reset();
         return turnPower;
     }
-    public Pose3D updateMegaTag2Pose(){
-        if (imu == null || limelight == null) return null;
-        double currentYaw = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-        double angularVelocity = imu.getRobotAngularVelocity(AngleUnit.DEGREES).zRotationRate;
-        limelight.updateRobotOrientation(currentYaw);
-        updateLimelight();
 
-        if (Math.abs(angularVelocity) > 720) {
-            return null;
-        }
-
-        if (result != null && result.isValid()) {
-            Pose3D mt2Pose = result.getBotpose_MT2();
-
-            if (mt2Pose != null) {
-                double x = mt2Pose.getPosition().x;
-                double y = mt2Pose.getPosition().y;
-                if (telemetry != null) {
-                    telemetry.addData("MT2 Location:", "(" + x + ", " + y + ")");
-                }
-                return mt2Pose;
-            }
-        }
-        return null;
-    }
 
 
     public void killSwitch() {

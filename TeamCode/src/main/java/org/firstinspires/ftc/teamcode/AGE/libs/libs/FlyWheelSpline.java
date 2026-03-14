@@ -10,13 +10,13 @@ public class FlyWheelSpline {
     public PolynomialSplineFunction splineCurve;
 
     public double minDistance = 0;
-    public double maxDistance = 75;
+    public double maxDistance = 130;
 
-    double minRPM = 0;
-    double maxRPM= 2250;
+    double minRPM = 150;
+    double maxRPM= 1500;
     /// de la mic la mare
-    private final double[] TESTED_DISTANCES = { minDistance,28, 30.0, 45, 50, 60.0, 70 , maxDistance};
-    private final double[] TESTED_RPMS =      { minRPM, 1800,1850, 1850, 2200, 2200, 2200 , maxRPM };
+    private final double[] TESTED_DISTANCES = { minDistance,71, 92, 99, 104, 116, 124 , maxDistance};
+    private final double[] TESTED_RPMS =      { minRPM, 1350,1445, 1470, 1475, 1450, 1500 , maxRPM };
 
     public FlyWheelSpline() {
         SplineInterpolator interpolator = new SplineInterpolator();

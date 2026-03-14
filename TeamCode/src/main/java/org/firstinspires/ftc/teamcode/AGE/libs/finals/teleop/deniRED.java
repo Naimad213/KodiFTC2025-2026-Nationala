@@ -36,7 +36,6 @@ public class deniRED extends LinearOpMode {
         robot = new KodiBotFinalV4(hardwareMap,"RED");
         gm1 = new GamepadEx(gamepad1);
         gm1.gamepad.setLedColor(217, 65, 148, 999999);
-        robot.pinPoint.init();
 
         /// manual bullk cache pentru a optimiza loading time
         allHubs = hardwareMap.getAll(LynxModule.class);
@@ -66,10 +65,12 @@ public class deniRED extends LinearOpMode {
 
                 x = -gm1.getLeftX();
                 y = -gm1.getLeftY();
-                robot.pinPoint.update();
-                theta = robot.imu.getRobotYawPitchRollAngles().getYaw();
-                theta += 360.0 * Math.abs(Math.min(0, Math.signum(theta)));
-                turn = gm1.getRightX();
+                
+                // Get Yaw in Degrees and normalize to 0-360
+                theta = robot.imu.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+                theta = (theta % 360 + 360) % 360;
+                
+                turn =  -gm1.getRightX();
 
 
                 if ((gm1.getButton(GamepadKeys.Button.RIGHT_BUMPER))){
@@ -109,26 +110,26 @@ public class deniRED extends LinearOpMode {
         robot.intake.update(leftTrigger, rightTrigger);
 
 
-        boolean b = false;
-        b=gm1.wasJustPressed(GamepadKeys.Button.B);
+        boolean b = gm1.getButton(GamepadKeys.Button.B);
 
-        double dist = (robot.vision.getDistance() != -1) ? robot.vision.getDistance() : 0;
-
+        double dist=0;
+        if(b){
+            robot.vision.updateLimelight();
+            dist = (robot.vision.getDistance() != -1) ? robot.vision.getDistance() :0;
+        }
         robot.outtake.update(b, dist);
-
+        robot.servoSubSystem.servoDreapta.setInverted(true);
         if (b && robot.outtake.readyToShoot() && robot.servoSubSystem.readyToLaunch()) {
-            robot.servoSubSystem.servoDreapta.setInverted(true);
             robot.servoSubSystem.servoDreapta.setPosition(0);
             robot.intake.update(0, 0);
-
-        } else if (!robot.servoSubSystem.readyToLaunch() && b &&dist==-1) {
-            robot.intake.update(0, 0.8);
-            robot.servoSubSystem.servoDreapta.setInverted(true);
+        }
+        if (!robot.servoSubSystem.readyToLaunch() && b && dist==0) {
+            robot.intake.update(0, 0.7);
             robot.servoSubSystem.servoDreapta.setPosition(0.3);
         } else {
-            robot.servoSubSystem.standby();
+            robot.servoSubSystem.servoDreapta.setPosition(0.3);
         }
 
-        robot.servoSubSystem.updateInversion();
+
     }
 }

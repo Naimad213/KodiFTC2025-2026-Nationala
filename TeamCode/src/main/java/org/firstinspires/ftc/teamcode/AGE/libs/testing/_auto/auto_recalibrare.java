@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
@@ -19,6 +20,7 @@ import org.firstinspires.ftc.teamcode.AGE.libs.libs.ServoSubSystem;
 
 import java.util.ArrayList;
 
+@Disabled
 @Autonomous(name = "auto-recalibrare", preselectTeleOp = "TELEOP-67", group = "AGE-AUTO")
 public class auto_recalibrare extends LinearOpMode {
 

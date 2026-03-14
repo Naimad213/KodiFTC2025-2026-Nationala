@@ -33,19 +33,17 @@ public class TestLocalizare extends LinearOpMode {
             initHW();
 
             waitForStart();
-        loc.start();
+        loc.startGemini();
 
 
             while(opModeIsActive() && !isStopRequested()){
                 gm1.readButtons();
                 double x = -gm1.getLeftX();
                 double y = -gm1.getLeftY();
-                robot.pinPoint.update();
-                double theta = robot.pinPoint.getPosition().getHeading(AngleUnit.DEGREES);
-                theta += 360.0 * Math.abs(Math.min(0, Math.signum(theta)));
-                double turn = -gm1.getRightX();
-                robot.driveWithVoltageCompensation(x,y,turn ,theta);
-
+                double r = -gm1.getRightX();
+//                robot.pinPoint.update();
+//                double theta = robot.pinPoint.getPosition().getHeading(AngleUnit.DEGREES);
+                robot.driveWithVoltageCompensation(x,y,r);
                 telemetry.addData("x: ",loc.getLocAsPoint().x);
                 telemetry.addData("y: ",loc.getLocAsPoint().y);
                 telemetry.addData("theta: ",loc.getLocAsPoint().theta);

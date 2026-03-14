@@ -36,7 +36,6 @@ public class deniBLUE extends LinearOpMode {
         robot = new KodiBotFinalV4(hardwareMap,"BLUE");
         gm1 = new GamepadEx(gamepad1);
         gm1.gamepad.setLedColor(217, 65, 148, 999999);
-        robot.pinPoint.init();
 
         /// manual bullk cache pentru a optimiza loading time
         allHubs = hardwareMap.getAll(LynxModule.class);
@@ -66,28 +65,27 @@ public class deniBLUE extends LinearOpMode {
 
                 x = -gm1.getLeftX();
                 y = -gm1.getLeftY();
-                robot.pinPoint.update();
-                theta = robot.pinPoint.getPosition().getHeading(AngleUnit.DEGREES);
-                theta += 360.0 * Math.abs(Math.min(0, Math.signum(theta)));
-                turn = gm1.getRightX();
+                theta = robot.imu.getAbsoluteHeading();
+                theta = (theta % 360 + 360) % 360;
+                turn = -gm1.getRightX();
 
 
-                if ((gm1.getButton(GamepadKeys.Button.RIGHT_BUMPER))){
-                    robot.vision.updateLimelight();
-                    turnCorrection = robot.vision.getLimelightRotationCorrection(robot.vision.isSeeingAprilTag(20));
-                } else {
-                    turnCorrection = 0;
-                }
-                finalTurnPower = turn+turnCorrection;
+//                if ((gm1.getButton(GamepadKeys.Button.RIGHT_BUMPER))){
+//                    robot.vision.updateLimelight();
+//                    turnCorrection = robot.vision.getLimelightRotationCorrection(robot.vision.isSeeingAprilTag(20));
+//                } else {
+//                    turnCorrection = 0;
+//                }
+//                finalTurnPower = turn+turnCorrection;
 
                 /// CHASSIS DRIVE
-                robot.driveWithVoltageCompensation(x, y, finalTurnPower, theta);
+                robot.driveWithVoltageCompensation(x, y, turn);
 
                 handleSubsystems();
                 /// calculam looptime si hz
                 double loopTime = loopTimer.milliseconds();
                 loopTimer.reset();
-
+                robot.vision.updateLimelight();
                 telemetry.addData("Loop Time (ms)", loopTime);
                 telemetry.addData("Loop Hz", 1000.0 / loopTime);
                 telemetry.addData("voltaj: ", robot.batteryVoltageSensor.getVoltage());
@@ -95,6 +93,7 @@ public class deniBLUE extends LinearOpMode {
                 telemetry.addData("ready to shoot" , robot.outtake.readyToShoot());
                 telemetry.addData("current rpm" , robot.outtake.getVelocity());
                 telemetry.addData("target rpm" , robot.outtake.currentTargetVelocity);
+                telemetry.addData("distance : " ,robot.vision.getDistance());
                 telemetry.update();
             }
         } catch (Exception e) {
@@ -109,26 +108,29 @@ public class deniBLUE extends LinearOpMode {
         robot.intake.update(leftTrigger, rightTrigger);
 
 
-        boolean b = gm1.wasJustPressed(GamepadKeys.Button.B);
+        boolean b = gm1.getButton(GamepadKeys.Button.B);
 
         double dist = (robot.vision.getDistance() != -1) ? robot.vision.getDistance() :0;
-
-        robot.outtake.update(b, dist);
-
-        if (b && robot.outtake.readyToShoot() && robot.servoSubSystem.readyToLaunch()) {
-            robot.servoSubSystem.servoDreapta.setInverted(true);
+        robot.servoSubSystem.servoDreapta.setInverted(true);
+        if (robot.outtake.readyToShoot()&& robot.servoSubSystem.readyToLaunch()) {
             robot.servoSubSystem.servoDreapta.setPosition(0);
-            robot.intake.update(0, 0);
-
-        } else if (!robot.servoSubSystem.readyToLaunch() && b && dist==-1) {
-            robot.intake.update(0, 0.8);
-            robot.servoSubSystem.servoDreapta.setInverted(true);
-            robot.servoSubSystem.servoDreapta.setPosition(0.3);
         } else {
-            robot.servoSubSystem.updateInversion();
-            robot.servoSubSystem.standby();
+            robot.servoSubSystem.servoDreapta.setPosition(0.5);
         }
 
-        robot.servoSubSystem.updateInversion();
+        robot.servoSubSystem.servoDreapta.setInverted(true);
+        if(b){
+            robot.vision.updateLimelight();
+            dist = (robot.vision.getDistance() != -1) ? robot.vision.getDistance() :0;
+        }
+        if (b && robot.outtake.readyToShoot() && robot.servoSubSystem.readyToLaunch()) {
+            robot.vision.updateLimelight();
+            robot.intake.update(0, 0);
+        }
+        if (!robot.servoSubSystem.readyToLaunch() && b && dist==0) {
+            robot.intake.update(0, 1);
+        }
+        robot.outtake.update(b, dist);
+
     }
 }

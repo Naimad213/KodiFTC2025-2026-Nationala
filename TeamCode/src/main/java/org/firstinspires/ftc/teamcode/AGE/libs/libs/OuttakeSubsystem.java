@@ -37,9 +37,21 @@ public class OuttakeSubsystem {
         pidfCoefficients = new PIDFCoefficients(0,0,0,0);
         flyWheelSpline= new FlyWheelSpline();
     }
-
-    public void update(boolean b,double distance) {
+    public void update(boolean b) {
         if(b) {
+            currentTargetVelocity = 130;
+            pidfCoefficients = new PIDFCoefficients(14, 0, 0, 14);
+            outtakeM2.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
+            outtakeM1.setVelocity(-currentTargetVelocity);
+            outtakeM1.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients);
+            outtakeM2.setVelocity(-currentTargetVelocity);
+        }else{
+            stop();
+        }
+
+    }
+    public void update(boolean b,double distance) {
+        if(b && distance!=0) {
             TARGET_RPM = flyWheelSpline.getTargetRPM(distance);
             currentTargetVelocity = TARGET_RPM;
             pidfCoefficients = new PIDFCoefficients(14, 0, 0, 14);

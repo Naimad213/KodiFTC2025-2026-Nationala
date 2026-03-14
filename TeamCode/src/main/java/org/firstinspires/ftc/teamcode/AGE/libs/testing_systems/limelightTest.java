@@ -28,7 +28,7 @@ public class limelightTest extends LinearOpMode {
         imu.init();
         telemetry= new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         limelight= new KodiLimelight();
-        vision = new KodiVision(hardwareMap, limelight  , "RED" , imu.imu);
+        vision = new KodiVision(hardwareMap, limelight  , "RED" );
 
         waitForStart();
         if(isStopRequested()) return;

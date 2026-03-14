@@ -20,10 +20,15 @@ public class KodiIMU extends GyroEx {
 
     @Override
     public void init() {
-        // MAKE SURE THESE MATCH YOUR PHYSICAL HUB MOUNTING
+        /*
+         * FIX: Incorrect orientation causes the "crazy" behavior at 90 degrees.
+         * Most robots have the Hub mounted flat.
+         * If your USB is pointing forward, use UP and FORWARD.
+         * To "invert X and Y" at the hardware level, you can flip UsbFacingDirection to BACKWARD.
+         */
         RevHubOrientationOnRobot orientation = new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-                RevHubOrientationOnRobot.UsbFacingDirection.DOWN
+                RevHubOrientationOnRobot.UsbFacingDirection.UP
         );
 
         imu.initialize(new IMU.Parameters(orientation));
@@ -36,25 +41,28 @@ public class KodiIMU extends GyroEx {
 
     @Override
     public double getHeading() {
-        // Returns normalized heading [-180, 180] relative to offset
-        double heading = getAbsoluteHeading() - offset;
-        return AngleUnit.normalizeDegrees(heading);
+        // Returns normalized heading [-180, 180]
+        return AngleUnit.normalizeDegrees(getAbsoluteHeading() - offset);
     }
 
     public double getAngle() {
-        // Returns 0-360 heading
-        return AngleUnit.normalizeDegrees(getAbsoluteHeading() - offset) + 180;
+        // Returns 0-360 heading for field-centric drive
+        double angle = (getAbsoluteHeading() - offset) % 360;
+        return (angle < 0) ? angle + 360 : angle;
     }
 
     @Override
     public double getAbsoluteHeading() {
         YawPitchRollAngles angles = imu.getRobotYawPitchRollAngles();
+        // Yaw is rotation around the vertical axis
         return angles.getYaw(AngleUnit.DEGREES) * multiplier;
     }
 
     @Override
     public void reset() {
-        offset = getAbsoluteHeading();
+        // Hardware reset: This makes the current heading "0"
+        imu.resetYaw();
+        offset = 0;
     }
 
     @Override
@@ -62,7 +70,6 @@ public class KodiIMU extends GyroEx {
         return Rotation2d.fromDegrees(getHeading());
     }
 
-    // Boilerplate for GyroEx
     @Override public double[] getAngles() { return new double[]{0, 0, 0}; }
     @Override public void disable() { imu.close(); }
     @Override public String getDeviceType() { return "REV Internal IMU"; }

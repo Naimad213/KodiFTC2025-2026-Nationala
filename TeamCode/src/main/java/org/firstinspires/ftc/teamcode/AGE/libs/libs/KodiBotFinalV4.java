@@ -5,6 +5,7 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.qualcomm.robotcore.util.Range;
 
 public class KodiBotFinalV4 {
     HardwareMap hardwareMap;
@@ -16,7 +17,7 @@ public class KodiBotFinalV4 {
     public Motor lFMotor, lRMotor, rFMotor, rRMotor;
 
     /// SUBSISTEME
-    public KodiPinPoint pinPoint;
+
     public IntakeSubsystem intake;
     public OuttakeSubsystem outtake;
     public ServoSubSystem servoSubSystem;
@@ -27,14 +28,16 @@ public class KodiBotFinalV4 {
     public KodiVision vision;
     public KodiLimelight limelight;
     public String teamColor;
-    public IMU imu;
+    public KodiIMU imu;
 
     public KodiBotFinalV4(HardwareMap hardwareMap, String teamColor) {
         this.hardwareMap = hardwareMap;
         this.teamColor = teamColor;
 
         this.limelight = new KodiLimelight();
-        this.imu = hardwareMap.get(IMU.class, "imu");
+        this.imu = new KodiIMU(hardwareMap);
+        imu.init();
+        imu.reset();
 
         if (this.teamColor.equals("RED")) {
             initRed();
@@ -56,13 +59,12 @@ public class KodiBotFinalV4 {
         rFMotor.setInverted(false);
 
         drive = new MecanumDrive(lFMotor, rFMotor, lRMotor, rRMotor);
-
         intake = new IntakeSubsystem(hardwareMap);
         outtake = new OuttakeSubsystem(hardwareMap);
         servoSubSystem = new ServoSubSystem(hardwareMap);
         flyWheelSpline = new FlyWheelSpline();
 
-        vision = new KodiVision(hardwareMap, limelight, teamColor, imu);
+        vision = new KodiVision(hardwareMap, limelight, teamColor);
 
         batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
     }
@@ -86,7 +88,7 @@ public class KodiBotFinalV4 {
         servoSubSystem = new ServoSubSystem(hardwareMap);
         flyWheelSpline = new FlyWheelSpline();
 
-        vision = new KodiVision(hardwareMap, limelight, teamColor, imu);
+        vision = new KodiVision(hardwareMap, limelight, teamColor);
 
         batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
     }
@@ -99,6 +101,7 @@ public class KodiBotFinalV4 {
         }
 
         double voltageScale = 12.0 / currentVoltage;
+        voltageScale= Range.clip(voltageScale , 0,1);
         double scaledX = x * voltageScale;
         double scaledY = y * voltageScale;
         double scaledR = r * voltageScale;
